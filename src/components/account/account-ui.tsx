@@ -289,16 +289,7 @@ function ModalAirdrop({ hide, show, address }: { hide: () => void; show: boolean
       submitLabel="Request Airdrop"
       submit={() => mutation.mutateAsync(parseFloat(amount)).then(() => hide())}
     >
-      <input
-        disabled={mutation.isPending}
-        type="number"
-        step="any"
-        min="1"
-        agenticescrow="Amount"
-        className="input input-bordered w-full"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
+      <input disabled={mutation.isPending} type="number" step="any" min="1" className="input input-bordered w-full" value={amount} onChange={(e) => setAmount(e.target.value)} />
     </AppModal>
   )
 }
@@ -329,24 +320,8 @@ function ModalSend({ hide, show, address }: { hide: () => void; show: boolean; a
           .then(() => hide())
       }}
     >
-      <input
-        disabled={mutation.isPending}
-        type="text"
-        agenticescrow="Destination"
-        className="input input-bordered w-full"
-        value={destination}
-        onChange={(e) => setDestination(e.target.value)}
-      />
-      <input
-        disabled={mutation.isPending}
-        type="number"
-        step="any"
-        min="1"
-        agenticescrow="Amount"
-        className="input input-bordered w-full"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
+      <input disabled={mutation.isPending} type="number" step="any" min="1" className="input input-bordered w-full" value={amount} onChange={(e) => setAmount(e.target.value)} />
+      <input disabled={mutation.isPending} type="number" step="any" min="1" className="input input-bordered w-full" value={amount} onChange={(e) => setAmount(e.target.value)} />
     </AppModal>
   )
 }

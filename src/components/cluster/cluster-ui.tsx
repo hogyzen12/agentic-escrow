@@ -98,20 +98,8 @@ export function ClusterUiModal({ hideModal, show }: { hideModal: () => void; sho
       }}
       submitLabel="Save"
     >
-      <input
-        type="text"
-        agenticescrow="Name"
-        className="input input-bordered w-full"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        agenticescrow="Endpoint"
-        className="input input-bordered w-full"
-        value={endpoint}
-        onChange={(e) => setEndpoint(e.target.value)}
-      />
+      <input type="text" aria-label="Name" className="input input-bordered w-full" value={name} onChange={(e) => setName(e.target.value)} />
+      <input type="text" aria-label="Name" className="input input-bordered w-full" value={name} onChange={(e) => setName(e.target.value)} />
       <select
         className="select select-bordered w-full"
         value={network}

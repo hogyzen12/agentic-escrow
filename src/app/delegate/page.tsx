@@ -1,7 +1,7 @@
 'use client';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   PublicKey,
   Transaction,
@@ -93,9 +93,8 @@ export default function DelegatePage() {
       question: "Can I unstake my JUP early, and are there any fees?",
       answer: "Yes, users can unstake their JUP early by withdrawing from the vault, but a fee applies. Early unstaking incurs a maximum fee of 30%, while waiting for 30 days reduces this fee to 0.1%. If the vault is depleted, users must wait the full 30-day period."
     },
-    {
-      question: "What happens if the vault runs out of funds?",
-      answer: "If too many users withdraw early, the vault may be depleted. In this case, users have two options:\n- Wait for the vault to be refilled (though this is not guaranteed)\n- Undergo the standard 30-day unstaking period to retrieve their funds"
+    { question: "What happens if the vault runs out of funds?", 
+      answer: 'If too many users withdraw early, the vault may be depleted. In this case, users have two options:\n- Wait for the vault to be refilled (though this is not guaranteed)\n- Undergo the standard 30-day unstaking period to retrieve their funds' 
     }
   ];
 
@@ -121,7 +120,7 @@ export default function DelegatePage() {
   });
 
   // Fetch total staked JUP
-  const fetchTotalStaked = async () => {
+  const fetchTotalStaked = useCallback(async () => {
     try {
       const stakedTokenAccount = await getAssociatedTokenAddress(
         TOKEN_Y_MINT,
@@ -136,7 +135,7 @@ export default function DelegatePage() {
       console.error('Error fetching total staked:', error);
       setTotalStaked(0);
     }
-  };
+  }, [connection]); // include connection if used inside
 
   // Refresh data every 15 seconds
   useInterval(() => {
@@ -149,7 +148,7 @@ export default function DelegatePage() {
   // Initial fetch
   useEffect(() => {
     fetchTotalStaked();
-  }, [connection]);
+  }, [fetchTotalStaked]);
 
   const handleInitializeEscrow = async () => {
     if (!publicKey || !signTransaction || !tokenYAccount) {
@@ -327,7 +326,7 @@ export default function DelegatePage() {
             <div className="text-white space-y-4 bg-gray-800/50 p-6 rounded-xl border border-emerald-400/20">
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Vote on your behalf, so you don't have to track proposals or spend time analyzing them.</p>
+                <p>Vote on your behalf, so you do not have to track proposals or spend time analyzing them.</p>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>

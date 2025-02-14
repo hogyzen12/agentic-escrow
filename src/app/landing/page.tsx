@@ -95,7 +95,7 @@ export default function LandingPage() {
             <h3 className="text-emerald-400 text-xl mb-4">CONQUER THE WORLD</h3>
             <p className="mb-4">
               From the shadowed alleys of Catastanbul, an ambitious feline rises to rewrite
-              DAO history. Once a crypto trader, this "Politician of DAOs" saw the harsh
+              DAO history. Once a crypto trader, this Politician of DAOs saw the harsh
               truth: holders voices are often drowned out in governance, leaving
               communities without true representation.
             </p>
