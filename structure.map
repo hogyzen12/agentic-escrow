@@ -1,0 +1,63 @@
+hogyzen12@anons-MacBook-Pro agentic-escrow % pwd
+/Users/hogyzen12/coding-project-folders/solana-escrow/agentic-escrow
+hogyzen12@anons-MacBook-Pro agentic-escrow % ls -l 
+total 1168
+-rw-r--r--@   1 hogyzen12  staff    1079 14 Jan 14:35 LICENSE
+-rw-r--r--    1 hogyzen12  staff    1497 19 Jan 05:14 README.md
+drwxrwxr-x   13 hogyzen12  staff     416 19 Jan 05:13 anchor
+-rw-r--r--    1 hogyzen12  staff     201 19 Jan 05:15 next-env.d.ts
+-rw-r--r--    1 hogyzen12  staff      92 14 Jan 14:35 next.config.mjs
+drwxr-xr-x  654 hogyzen12  staff   20928  3 Feb 18:45 node_modules
+-rw-r--r--    1 hogyzen12  staff  560538  3 Feb 18:45 package-lock.json
+-rw-r--r--    1 hogyzen12  staff    1338  3 Feb 18:45 package.json
+-rw-r--r--    1 hogyzen12  staff     135 14 Jan 14:35 postcss.config.mjs
+drwxrwxr-x    7 hogyzen12  staff     224 13 Feb 02:14 public
+drwxrwxr-x    7 hogyzen12  staff     224 19 Jan 07:05 src
+-rw-r--r--    1 hogyzen12  staff     311 14 Jan 14:35 tailwind.config.ts
+-rw-r--r--    1 hogyzen12  staff    1287 19 Jan 07:05 tree
+-rw-r--r--    1 hogyzen12  staff     662 14 Jan 14:35 tsconfig.json
+hogyzen12@anons-MacBook-Pro agentic-escrow % cd ap
+cd: no such file or directory: ap
+hogyzen12@anons-MacBook-Pro agentic-escrow % cd src 
+hogyzen12@anons-MacBook-Pro src % ls -l
+total 0
+drwxrwxr-x  17 hogyzen12  staff  544 13 Feb 02:28 app
+drwxrwxr-x   9 hogyzen12  staff  288 19 Jan 06:03 components
+drwxr-xr-x   4 hogyzen12  staff  128 19 Jan 06:06 hooks
+drwxr-xr-x   4 hogyzen12  staff  128 19 Jan 06:52 utils
+hogyzen12@anons-MacBook-Pro src % ls -l *
+app:
+total 96
+drwxrwxr-x  5 hogyzen12  staff    160 19 Jan 06:03 account
+drwxrwxr-x  3 hogyzen12  staff     96 19 Jan 05:13 api
+drwxrwxr-x  3 hogyzen12  staff     96 19 Jan 05:13 basic
+drwxrwxr-x  3 hogyzen12  staff     96 19 Jan 05:13 clusters
+drwxr-xr-x  5 hogyzen12  staff    160  4 Feb 19:11 components
+drwxr-xr-x  5 hogyzen12  staff    160 13 Feb 02:42 delegate
+-rw-r--r--  1 hogyzen12  staff  32038 14 Jan 14:35 favicon.ico
+-rw-r--r--  1 hogyzen12  staff    376 14 Jan 14:35 globals.css
+drwxr-xr-x  3 hogyzen12  staff     96  3 Feb 19:04 jupiter
+drwxr-xr-x  3 hogyzen12  staff     96 13 Feb 02:07 landing
+-rw-r--r--  1 hogyzen12  staff   1037 13 Feb 02:33 layout.tsx
+-rw-r--r--  1 hogyzen12  staff    138 14 Jan 14:35 page.tsx
+-rw-r--r--  1 hogyzen12  staff    511 14 Jan 14:35 react-query-provider.tsx
+drwxr-xr-x  4 hogyzen12  staff    128 13 Feb 05:06 redeem
+
+components:
+total 0
+drwxrwxr-x  6 hogyzen12  staff  192 19 Jan 05:13 account
+drwxrwxr-x  5 hogyzen12  staff  160 19 Jan 05:13 basic
+drwxrwxr-x  5 hogyzen12  staff  160 19 Jan 05:13 cluster
+drwxrwxr-x  3 hogyzen12  staff   96 19 Jan 05:13 dashboard
+drwxrwxr-x  3 hogyzen12  staff   96 19 Jan 05:13 solana
+drwxrwxr-x  3 hogyzen12  staff   96 19 Jan 05:13 ui
+
+hooks:
+total 16
+-rw-r--r--  1 hogyzen12  staff  1408 19 Jan 06:06 use-token-accounts.ts
+-rw-r--r--  1 hogyzen12  staff   413 19 Jan 05:54 useInterval.ts
+
+utils:
+total 16
+-rw-r--r--  1 hogyzen12  staff   553 13 Feb 04:19 constants.ts
+-rw-r--r--  1 hogyzen12  staff  2496 19 Jan 07:36 escrow.ts
