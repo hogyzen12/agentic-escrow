@@ -1,12 +1,11 @@
 import { PublicKey } from '@solana/web3.js';
 
-export const ESCROW_PROGRAM_ID = new PublicKey("9BFaTLodYCQgaWaLTKcjCnQejsz2BDj8FEjEX9WiH7aE");
+export const ESCROW_PROGRAM_ID = new PublicKey("EscRwGsLp82GNJT12TiEGEQDkRCusZYUb7CfJsya9CqD");
+export const TOKEN_X_MINT = new PublicKey("GovJupiFjKj6dY44qHT4i2FzDejKTCZSvKpabZYQSFF");
+export const TOKEN_Y_MINT = new PublicKey("JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN");
 
-// Token mints from your escrow test setup
-export const TOKEN_X_MINT = new PublicKey("govWhBbECjKEoTYnmzPjXxkjs9LknQedKsrxu1L8Lsw");
+export const STAKED_JUP = new PublicKey("CwB36s8KFNLoCu99wLeM1BMLMMRZUthNX5wH8JNo43sZ");
+export const VAULT_JUP = new PublicKey("BDunM82nxZJB6Yj8RAY98kvxqFvTqVwefMHShTNkeYfh");
 
-// We'll get this after running the setup script
-export const TOKEN_Y_MINT = new PublicKey("JUP42W57u98mdaAJLF2G4LPexKiwhxTiSPuMniDpfEp");
-
-// We'll get this after running the setup script
-export const STAKED_JUP = new PublicKey("sB1WwHrDdNJD6brkANKtGRdLi7j3BL3kcJ4BcE3jugx");
+export const GOV_TOKEN = new PublicKey('GovJupiFjKj6dY44qHT4i2FzDejKTCZSvKpabZYQSFF');
+export const AGENT_ADDRESS = new PublicKey('govAiNGS59yJfvqdmvYb7Lzk7wUHYygqiKR58Z1VCag');

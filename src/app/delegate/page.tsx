@@ -2,6 +2,7 @@
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useState, useEffect, useCallback } from 'react';
+import TokenStats from '@/components/metrics/TokenStats';
 import {
   PublicKey,
   Transaction,
@@ -31,7 +32,7 @@ import { ESCROW_ACCOUNT_DATA_LAYOUT } from '@/utils/escrow';
 import { useInterval } from '@/hooks/useInterval';
 
 // Staking window end date - February 20th, 2024 at midnight UTC
-const STAKING_END_DATE = new Date('2025-02-20T00:00:00Z');
+const STAKING_END_DATE = new Date('2025-02-28T00:00:00Z');
 
 function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState('');
@@ -91,7 +92,7 @@ export default function DelegatePage() {
     },
     {
       question: "Can I unstake my JUP early, and are there any fees?",
-      answer: "Yes, users can unstake their JUP early by withdrawing from the vault, but a fee applies. Early unstaking incurs a maximum fee of 30%, while waiting for 30 days reduces this fee to 0.1%. If the vault is depleted, users must wait the full 30-day period."
+      answer: "Yes, users can unstake their JUP early by withdrawing from the vault, but a fee applies. Early unstaking incurs a maximum fee of 20%, while waiting for 30 days reduces this fee to 0.1%. If the vault is depleted, users must wait the full 30-day period."
     },
     { question: "What happens if the vault runs out of funds?", 
       answer: 'If too many users withdraw early, the vault may be depleted. In this case, users have two options:\n- Wait for the vault to be refilled (though this is not guaranteed)\n- Undergo the standard 30-day unstaking period to retrieve their funds' 
@@ -130,7 +131,7 @@ export default function DelegatePage() {
       
       const accountInfo = await getAccount(connection, STAKED_JUP);
       const balance = Number(accountInfo.amount);
-      setTotalStaked(balance / Math.pow(10, 9)); // Assuming 9 decimals for JUP
+      setTotalStaked(balance / Math.pow(10, 6)); // Assuming 9 decimals for JUP
     } catch (error) {
       console.error('Error fetching total staked:', error);
       setTotalStaked(0);
@@ -159,7 +160,7 @@ export default function DelegatePage() {
       return;
     }
 
-    const DECIMALS = 9;
+    const DECIMALS = 6;
     const jupAmount = parseFloat(swapAmount);
     if (isNaN(jupAmount) || jupAmount <= 0) {
       notify({ type: 'error', message: 'Invalid delegation amount' });
@@ -320,6 +321,9 @@ export default function DelegatePage() {
           </div>
         </div>
 
+        {/* Token Statistics */}
+        <TokenStats />  
+
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Left Column - Info and Benefits */}
           <div className="space-y-6">
@@ -432,8 +436,8 @@ export default function DelegatePage() {
               </button>
 
               <div className="flex justify-between text-sm text-gray-400 bg-gray-700/30 p-3 rounded-lg">
-                <span>ASR + EARLY UNSTAKING FEE: 30%</span>
-                <span>BASE APR: ≈30%</span>
+                <span>ASR + EARLY UNSTAKING FEE: 20%</span>
+                <span>BASE APR: ≈20%</span>
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useState, useEffect, useMemo } from 'react';
+import TokenStats from '@/components/metrics/TokenStats';
 import {
   PublicKey,
   Transaction,
@@ -35,12 +36,12 @@ function parseTokenAmountToBN(amountStr: string, decimals: number): BN {
 
 function getRatioBN(days: number): BN {
   const BASE = new BN('1000000000');
-  const SEVENTY_PERCENT = new BN('700000000');
-  const THIRTY_PERCENT = new BN('300000000');
+  const EIGHTY_PERCENT = new BN('800000000');
+  const TWENTY_PERCENT = new BN('200000000');
 
   if (days >= 30) return BASE;
-  const increment = THIRTY_PERCENT.mul(new BN(days)).div(new BN(30));
-  return SEVENTY_PERCENT.add(increment);
+  const increment = TWENTY_PERCENT.mul(new BN(days)).div(new BN(30));
+  return EIGHTY_PERCENT.add(increment);
 }
 
 function bnToDecimalString(amountBN: BN, decimals: number, maxFractionDigits = 4): string {
@@ -93,16 +94,16 @@ export default function RedeemPage() {
 
   const getRatio = (days: number): number => {
     if (days >= 30) return 1;
-    return 0.7 + (0.3 * days / 30);
+    return 0.8 + (0.2 * days / 30);
   };
 
   const estimatedJUPReturn = useMemo(() => {
     if (!govAmount) return "0.0";
-    const govBN = parseTokenAmountToBN(govAmount, 9);
+    const govBN = parseTokenAmountToBN(govAmount, 6);
     if (govBN.isZero()) return "0.0";
     const ratioBN = getRatioBN(unlockDays);
     const jupBN = govBN.mul(ratioBN).div(new BN('1000000000'));
-    return bnToDecimalString(jupBN, 9, 4);
+    return bnToDecimalString(jupBN, 6, 3);
   }, [govAmount, unlockDays]);
 
   const handleInitializeUnstake = async () => {
@@ -111,7 +112,7 @@ export default function RedeemPage() {
       return;
     }
 
-    const rawGovAmountBN = parseTokenAmountToBN(govAmount, 9);
+    const rawGovAmountBN = parseTokenAmountToBN(govAmount, 6);
     if (rawGovAmountBN.lte(new BN(0))) {
       notify({ type: 'error', message: 'Invalid GOV amount' });
       return;
@@ -270,13 +271,16 @@ export default function RedeemPage() {
           </p>
         </div>
 
+        {/* Token Statistics */}
+        <TokenStats />  
+
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Left Column - Info and Benefits */}
           <div className="space-y-6">
             <div className="text-white space-y-4 bg-gray-800/50 p-6 rounded-xl border border-emerald-400/20">
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Choose your unlock period: instant with a 30% fee, or wait up to 30 days for no fee.</p>
+                <p>Choose your unlock period: instant with a 20% fee, or wait up to 30 days for no fee.</p>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
@@ -350,7 +354,7 @@ export default function RedeemPage() {
                 step="1"
               />
               <div className="flex justify-between text-sm text-gray-400 mt-2">
-                <span>Instant (30% fee)</span>
+                <span>Instant (20% fee)</span>
                 <span>30 days (0% fee)</span>
               </div>
             </div>

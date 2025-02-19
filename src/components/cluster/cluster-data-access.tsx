@@ -14,27 +14,20 @@ export interface Cluster {
 }
 
 export enum ClusterNetwork {
-  Mainnet = 'mainnet-beta',
-  Testnet = 'testnet',
-  Devnet = 'devnet',
-  Custom = 'custom',
+  Mainnet = 'mainnet-beta'
 }
 
-// By default, we don't configure the mainnet-beta cluster
-// The endpoint provided by clusterApiUrl('mainnet-beta') does not allow access from the browser due to CORS restrictions
-// To use the mainnet-beta cluster, provide a custom endpoint
+// Environment variable validation
+if (!process.env.NEXT_PUBLIC_SOLANA_RPC_ENDPOINT) {
+  throw new Error('NEXT_PUBLIC_SOLANA_RPC_ENDPOINT is not defined in environment variables')
+}
+
 export const defaultClusters: Cluster[] = [
   {
-    name: 'devnet',
-    endpoint: clusterApiUrl('devnet'),
-    network: ClusterNetwork.Devnet,
-  },
-  { name: 'local', endpoint: 'http://localhost:8899' },
-  {
-    name: 'testnet',
-    endpoint: clusterApiUrl('testnet'),
-    network: ClusterNetwork.Testnet,
-  },
+    name: 'mainnet',
+    endpoint: process.env.NEXT_PUBLIC_SOLANA_RPC_ENDPOINT,
+    network: ClusterNetwork.Mainnet,
+  }
 ]
 
 const clusterAtom = atomWithStorage<Cluster>('solana-cluster', defaultClusters[0])
@@ -99,19 +92,10 @@ export function useCluster() {
 function getClusterUrlParam(cluster: Cluster): string {
   let suffix = ''
   switch (cluster.network) {
-    case ClusterNetwork.Devnet:
-      suffix = 'devnet'
-      break
     case ClusterNetwork.Mainnet:
       suffix = ''
       break
-    case ClusterNetwork.Testnet:
-      suffix = 'testnet'
-      break
-    default:
-      suffix = `custom&customUrl=${encodeURIComponent(cluster.endpoint)}`
-      break
-  }
+    }
 
   return suffix.length ? `?cluster=${suffix}` : ''
 }
