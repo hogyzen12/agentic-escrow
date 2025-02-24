@@ -1,10 +1,8 @@
 'use client';
 
 import { useConnection } from '@solana/wallet-adapter-react';
-import { useState, useEffect } from 'react';
-import { PublicKey } from '@solana/web3.js';
+import { useState} from 'react';
 import { getAccount } from '@solana/spl-token';
-import * as anchor from '@project-serum/anchor';
 import {
   IconArrowUpRight,
   IconChartPie,
@@ -13,7 +11,6 @@ import {
 } from '@tabler/icons-react';
 import TokenStats from '@/components/metrics/TokenStats';
 import ActivityStream from '@/components/metrics/ActivityStream';
-import { useInterval } from '@/hooks/useInterval';
 import {
   STAKED_JUP,
   VAULT_JUP,
