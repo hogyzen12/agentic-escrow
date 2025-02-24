@@ -2,7 +2,6 @@
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useState, useEffect, useCallback } from 'react';
-import TokenStats from '@/components/metrics/TokenStats';
 import {
   PublicKey,
   Transaction,
@@ -11,8 +10,6 @@ import {
   SYSVAR_RENT_PUBKEY,
   Keypair
 } from '@solana/web3.js';
-import { useRouter } from 'next/navigation';
-import BN from 'bn.js';
 import {
   TOKEN_PROGRAM_ID,
   AccountLayout,
@@ -23,15 +20,21 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getAccount
 } from '@solana/spl-token';
-import { IconQuestionMark } from '@tabler/icons-react';
+import BN from 'bn.js';
+import { useRouter } from 'next/navigation';
+import { useInterval } from '@/hooks/useInterval';
+import { IconInfoCircle } from '@tabler/icons-react';
 
 import { TOKEN_X_MINT, TOKEN_Y_MINT, ESCROW_PROGRAM_ID, STAKED_JUP } from '@/utils/constants';
 import { notify } from '../components/ui/notify';
 import { useGetTokenAccounts, useTokenBalance } from '@/hooks/use-token-accounts';
 import { ESCROW_ACCOUNT_DATA_LAYOUT } from '@/utils/escrow';
-import { useInterval } from '@/hooks/useInterval';
+import FAQs from '@/components/metrics/FAQs';
 
-// Staking window end date - February 20th, 2024 at midnight UTC
+// Maximum staking amount (41,990 JUP)
+const MAX_STAKE_AMOUNT = 41990;
+
+// Staking window end date
 const STAKING_END_DATE = new Date('2025-02-28T00:00:00Z');
 
 function CountdownTimer() {
@@ -62,8 +65,8 @@ function CountdownTimer() {
   }, []);
 
   return (
-    <div className="text-center p-2 bg-gray-700 rounded-lg mb-4">
-      <span className="text-emerald-400 font-semibold">Staking Window Closes In: </span>
+    <div className="text-center p-3 bg-[#2A3B4D] rounded-xl mb-6">
+      <span className="text-[#3DD2C0] font-medium">Staking Window Closes In: </span>
       <span className="text-white">{timeLeft}</span>
     </div>
   );
@@ -73,38 +76,13 @@ export default function DelegatePage() {
   const router = useRouter();
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
-  const [swapAmount, setSwapAmount] = useState<string>("");
-  const [selectedFaq, setSelectedFaq] = useState<number | null>(null);
-  const [totalStaked, setTotalStaked] = useState<number | null>(null);
+  const [stakeAmount, setStakeAmount] = useState<string>("");
 
-  const faqs = [
-    {
-      question: "What exactly does the GovAI bot do?",
-      answer: "GovAI is a governance-focused AI Agent designed to facilitate JUP staking, delegation, and voting participation. The AI Agent stakes and votes on behalf of the users and decentralizes the rewards for them."
-    },
-    {
-      question: "How does staking with the AI Agent work?",
-      answer: "Users stake their JUP tokens with GovAI and receive govJUP representing their delegated JUP. The AI Agent votes on behalf of users and ensures their influence in governance while they earn ASR rewards."
-    },
-    {
-      question: "What is the staking window?",
-      answer: "Users can stake only during the 'staking window,' which opens after ASR rewards become claimable and closes before the next vote. This ensures all participants JUP contributes equally to the same set of votes."
-    },
-    {
-      question: "Can I unstake my JUP early, and are there any fees?",
-      answer: "Yes, users can unstake their JUP early by withdrawing from the vault, but a fee applies. Early unstaking incurs a maximum fee of 20%, while waiting for 30 days reduces this fee to 0.1%. If the vault is depleted, users must wait the full 30-day period."
-    },
-    { question: "What happens if the vault runs out of funds?", 
-      answer: 'If too many users withdraw early, the vault may be depleted. In this case, users have two options:\n- Wait for the vault to be refilled (though this is not guaranteed)\n- Undergo the standard 30-day unstaking period to retrieve their funds' 
-    }
-  ];
-
-  // Get token accounts for the connected wallet
+  // Token accounts setup
   const { data: tokenAccounts, refetch: refetchTokenAccounts } = useGetTokenAccounts({
     address: publicKey,
   });
 
-  // Find token accounts
   const tokenXAccount = tokenAccounts?.find(
     (account) => account.account.data.parsed.info.mint === TOKEN_X_MINT.toString()
   );
@@ -112,7 +90,6 @@ export default function DelegatePage() {
     (account) => account.account.data.parsed.info.mint === TOKEN_Y_MINT.toString()
   );
 
-  // Get token balances with refetch capability
   const { data: balanceX, refetch: refetchBalanceX } = useTokenBalance({
     tokenAccount: tokenXAccount ? new PublicKey(tokenXAccount.pubkey) : null,
   });
@@ -120,36 +97,30 @@ export default function DelegatePage() {
     tokenAccount: tokenYAccount ? new PublicKey(tokenYAccount.pubkey) : null,
   });
 
-  // Fetch total staked JUP
-  const fetchTotalStaked = useCallback(async () => {
-    try {
-      const stakedTokenAccount = await getAssociatedTokenAddress(
-        TOKEN_Y_MINT,
-        STAKED_JUP,
-        true
-      );
-      
-      const accountInfo = await getAccount(connection, STAKED_JUP);
-      const balance = Number(accountInfo.amount);
-      setTotalStaked(balance / Math.pow(10, 6)); // Assuming 9 decimals for JUP
-    } catch (error) {
-      console.error('Error fetching total staked:', error);
-      setTotalStaked(0);
-    }
-  }, [connection]); // include connection if used inside
-
-  // Refresh data every 15 seconds
+  // Refresh data periodically
   useInterval(() => {
     refetchTokenAccounts();
     refetchBalanceX();
     refetchBalanceY();
-    fetchTotalStaked();
-  }, 15000);
+  }, 6900);
 
-  // Initial fetch
-  useEffect(() => {
-    fetchTotalStaked();
-  }, [fetchTotalStaked]);
+  const isStakingWindowOpen = () => {
+    return new Date() < STAKING_END_DATE;
+  };
+
+  const handleStakeInput = (value: string) => {
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue <= 0) {
+      setStakeAmount(value);
+      return;
+    }
+    // Ensure the input doesn't exceed MAX_STAKE_AMOUNT
+    if (numValue > MAX_STAKE_AMOUNT) {
+      setStakeAmount(MAX_STAKE_AMOUNT.toString());
+      return;
+    }
+    setStakeAmount(value);
+  };
 
   const handleInitializeEscrow = async () => {
     if (!publicKey || !signTransaction || !tokenYAccount) {
@@ -161,8 +132,8 @@ export default function DelegatePage() {
     }
 
     const DECIMALS = 6;
-    const jupAmount = parseFloat(swapAmount);
-    if (isNaN(jupAmount) || jupAmount <= 0) {
+    const jupAmount = parseFloat(stakeAmount);
+    if (isNaN(jupAmount) || jupAmount <= 0 || jupAmount > MAX_STAKE_AMOUNT) {
       notify({ type: 'error', message: 'Invalid delegation amount' });
       return;
     }
@@ -265,13 +236,6 @@ export default function DelegatePage() {
         preflightCommitment: "confirmed"
       });
       
-      notify({ type: 'success', message: 'Processing delegation...' });
-      
-      const confirmation = await connection.confirmTransaction(txId, 'confirmed');
-      if (confirmation.value.err) {
-        throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
-      }
-
       notify({ 
         type: 'success', 
         message: `Successfully delegated ${jupAmount} JUP to GovAI` 
@@ -283,144 +247,68 @@ export default function DelegatePage() {
     }
   };
 
-  const isStakingWindowOpen = () => {
-    return new Date() < STAKING_END_DATE;
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen bg-[#0D1117]">
+      <div className="container mx-auto px-6 py-12">
         <div className="mb-12">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            <span className="text-emerald-400">STAKE</span> YOUR JUP WITH GOVAI
+          <h1 className="text-3xl font-bold mb-4">
+            <span className="text-[#3DD2C0]">STAKE</span>
+            <span className="text-white"> YOUR JUP WITH GOVAI</span>
           </h1>
-          <p className="text-gray-400">
+          <p className="text-white/70">
             Stake your JUP with GovAI, the expert AI who deals with governance for you.
           </p>
-          
-          {/* Total Staked Display */}
-          <div className="mt-6 bg-gray-800/50 rounded-xl p-4 border border-emerald-400/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-emerald-400 text-lg">Total JUP Staked with GovAI</h3>
-                <p className="text-gray-400 text-sm">Trusted by the community</p>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-bold text-white">
-                  {totalStaked ? totalStaked.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0.00'}
-                </span>
-                <span className="text-gray-400 ml-2">JUP</span>
-              </div>
-            </div>
-            <div className="mt-2 bg-gray-700/50 rounded-full h-2">
-              <div 
-                className="bg-emerald-400 h-2 rounded-full transition-all duration-1000"
-                style={{ width: `${Math.min((totalStaked || 0) / 1000000 * 100, 100)}%` }}
-              ></div>
-            </div>
-          </div>
         </div>
 
-        {/* Token Statistics */}
-        <TokenStats />  
-
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column - Info and Benefits */}
-          <div className="space-y-6">
-            <div className="text-white space-y-4 bg-gray-800/50 p-6 rounded-xl border border-emerald-400/20">
-              <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Vote on your behalf, so you do not have to track proposals or spend time analyzing them.</p>
-              </div>
-              <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Collect all types of rewards from governance and staking activities.</p>
-              </div>
-              <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Distribute a share of the fees collected from the service and early redemptions to other stakers.</p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => router.push('/whitepaper')}
-              className="btn btn-outline text-white hover:bg-gray-700 w-full md:w-auto border-emerald-400/50 hover:border-emerald-400"
-            >
-              WHITEPAPER
-            </button>
-
-            {/* FAQ Section */}
-            <div className="mt-8">
-              <h2 className="text-white text-xl font-bold mb-4">FAQ</h2>
-              <div className="space-y-4">
-                {faqs.map((faq, index) => (
-                  <div 
-                    key={index} 
-                    className="bg-gray-800/50 rounded-lg p-4 border border-emerald-400/20 hover:border-emerald-400/40 transition-all"
-                  >
-                    <button
-                      className="flex justify-between items-center w-full text-white"
-                      onClick={() => setSelectedFaq(selectedFaq === index ? null : index)}
-                    >
-                      <span className="text-left">{faq.question}</span>
-                      <IconQuestionMark className={`w-5 h-5 transform transition-transform ${
-                        selectedFaq === index ? 'rotate-180' : ''
-                      }`} />
-                    </button>
-                    {selectedFaq === index && (
-                      <p className="mt-4 text-gray-400">{faq.answer}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Staking Interface */}
-          <div className="bg-gray-800/80 rounded-xl p-6 h-fit border border-emerald-400/20">
+        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          {/* Staking Interface */}
+          <div className="bg-[#1E2C3D] rounded-xl p-8 border border-[#3DD2C0]/10">
             <CountdownTimer />
             
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-gray-400">govJUP Balance</div>
+                  <div className="text-white/60">govJUP Balance</div>
                   <div className="text-2xl text-white">{balanceX ?? '0.00'}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-gray-400">JUP Balance</div>
+                  <div className="text-white/60">JUP Balance</div>
                   <div className="text-2xl text-white">{balanceY ?? '0.00'}</div>
                 </div>
               </div>
 
-              <div className="form-control">
-                <div className="flex items-center space-x-2 bg-gray-700/50 rounded-lg p-4 border border-emerald-400/20">
-                  <input 
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={swapAmount}
-                    onChange={(e) => setSwapAmount(e.target.value)}
-                    className="bg-transparent text-white text-lg w-full focus:outline-none"
-                    placeholder="0.00"
-                    disabled={!isStakingWindowOpen()}
-                  />
-                  <span className="text-white">JUP</span>
+              <div className="bg-[#2A3B4D] rounded-xl p-4">
+                <input
+                  type="number"
+                  min="0"
+                  max={MAX_STAKE_AMOUNT}
+                  step="any"
+                  value={stakeAmount}
+                  onChange={(e) => handleStakeInput(e.target.value)}
+                  className="w-full bg-transparent text-white text-lg focus:outline-none"
+                  placeholder="0.00"
+                  disabled={!isStakingWindowOpen()}
+                />
+                <div className="flex justify-between mt-2">
+                  <span className="text-white/60 text-sm">JUP</span>
+                  <span className="text-white/60 text-sm">Max: {MAX_STAKE_AMOUNT.toLocaleString()} JUP</span>
                 </div>
               </div>
 
-              <button 
-                className={`btn btn-lg w-full bg-emerald-500 hover:bg-emerald-600 border-none text-lg
-                  animate-pulse hover:animate-none transform transition-transform hover:scale-105
-                  ${!isStakingWindowOpen() ? 'opacity-50 cursor-not-allowed' : ''}`}
+              <button
                 onClick={handleInitializeEscrow}
                 disabled={
                   !isStakingWindowOpen() ||
                   !publicKey ||
                   !balanceY ||
-                  isNaN(parseFloat(swapAmount)) ||
-                  parseFloat(swapAmount) <= 0 ||
-                  parseFloat(swapAmount) > (balanceY || 0)
+                  isNaN(parseFloat(stakeAmount)) ||
+                  parseFloat(stakeAmount) <= 0 ||
+                  parseFloat(stakeAmount) > Math.min(balanceY, MAX_STAKE_AMOUNT)
                 }
+                className={`w-full py-4 rounded-xl text-lg font-medium transition-all
+                  ${!isStakingWindowOpen() || !publicKey || !balanceY || parseFloat(stakeAmount) > (balanceY || 0)
+                    ? 'bg-[#2A3B4D] text-white/50 cursor-not-allowed'
+                    : 'bg-[#3DD2C0] text-[#0D1117] hover:bg-[#2FC1AF]'}`}
               >
                 {!isStakingWindowOpen() ? (
                   'Staking Window Closed'
@@ -428,20 +316,50 @@ export default function DelegatePage() {
                   'Connect Wallet'
                 ) : !balanceY ? (
                   'No JUP Balance'
-                ) : parseFloat(swapAmount) > (balanceY || 0) ? (
+                ) : parseFloat(stakeAmount) > (balanceY || 0) ? (
                   'Insufficient JUP Balance'
                 ) : (
                   'STAKE YOUR JUP'
                 )}
               </button>
 
-              <div className="flex justify-between text-sm text-gray-400 bg-gray-700/30 p-3 rounded-lg">
+              <div className="flex justify-between text-sm text-white/60 bg-[#2A3B4D] p-4 rounded-xl">
                 <span>ASR + EARLY UNSTAKING FEE: 20%</span>
                 <span>BASE APR: ≈20%</span>
               </div>
             </div>
           </div>
+
+          {/* Info Section */}
+          <div className="space-y-6">
+            <div className="bg-[#1E2C3D] rounded-xl p-8 border border-[#3DD2C0]/10">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-[#3DD2C0] rounded-full mt-2"></div>
+                  <p className="text-white/70">Vote on your behalf, so you do not have to track proposals or spend time analyzing them.</p>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-[#3DD2C0] rounded-full mt-2"></div>
+                  <p className="text-white/70">Collect all types of rewards from governance and staking activities.</p>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-[#3DD2C0] rounded-full mt-2"></div>
+                  <p className="text-white/70">Distribute a share of the fees collected from the service and early redemptions to other stakers.</p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => router.push('/whitepaper')}
+              className="w-full py-3 bg-[#2A3B4D] rounded-xl text-white/80 hover:text-white transition-all border border-[#3DD2C0]/10 hover:border-[#3DD2C0]/30"
+            >
+              WHITEPAPER
+            </button>
+          </div>
         </div>
+
+        {/* FAQ Section */}
+        <FAQs />
       </div>
     </div>
   );

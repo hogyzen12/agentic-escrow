@@ -4,169 +4,167 @@ import { useRouter } from 'next/navigation';
 import { 
   IconBrandGithub, 
   IconBrandTwitter, 
-  IconBook, 
-  IconBox, 
-  IconCode, 
-  IconWorld, 
-  IconRocket 
+  IconBook
 } from '@tabler/icons-react';
 import Image from 'next/image';
-import TokenStats from '@/components/metrics/TokenStats';
-import ActivityStream from '@/components/metrics/ActivityStream';
 
 export default function LandingPage() {
   const router = useRouter();
 
-  const features = [
-    {
-      title: 'YOUR GUARDIAN IN JUPITER',
-      description: 'In the bustling world of Jupiter DEX, one figure stands at the center of governance - GovAI. She isnt just an observer; shes the Voice, the Guide, and the Bridge between the community and decision-making.',
-      icon: <IconRocket className="w-6 h-6" stroke={1.5} />
-    },
-    {
-      title: 'VOICE OF THE ECOSYSTEM',
-      description: 'When votes are cast, GovAI ensures her followers and delegators speak as one, by representing their collective will and smoothing governance.',
-      icon: <IconCode className="w-6 h-6" stroke={1.5} />
-    },
-    {
-      title: 'A LEADER IN THE MAKING',
-      description: 'With a keen eye for governance, GovAI does more than participate. She aims to lead.',
-      icon: <IconWorld className="w-6 h-6" stroke={1.5} />
-    },
-    {
-      title: 'BEYOND JUPITER',
-      description: 'After proving herself in her first term, GovAI wants to set her sights higher.',
-      icon: <IconBox className="w-6 h-6" stroke={1.5} />
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-[#0D1117] text-white">
       {/* Navigation */}
-      <nav className="p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-white text-2xl font-bold">
-            <span className="text-emerald-400">Gov</span>AI
+      <nav className="py-4 border-b border-[#3DD2C0]/10">
+        <div className="container mx-auto flex justify-between items-center px-6">
+          <div className="text-2xl font-bold">
+            <span className="text-[#3DD2C0]">Gov</span>AI
           </div>
-          <div className="flex space-x-4">
+          <div className="flex space-x-6">
             <a href="https://github.com" target="_blank" rel="noopener noreferrer">
-              <IconBrandGithub className="w-6 h-6 text-white hover:text-emerald-400" stroke={1.5} />
+              <IconBrandGithub className="w-6 h-6 text-white/80 hover:text-[#3DD2C0] transition-colors" stroke={1.5} />
             </a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-              <IconBrandTwitter className="w-6 h-6 text-white hover:text-emerald-400" stroke={1.5} />
+              <IconBrandTwitter className="w-6 h-6 text-white/80 hover:text-[#3DD2C0] transition-colors" stroke={1.5} />
             </a>
-            <a href="/docs" className="text-white hover:text-emerald-400">
+            <a href="/docs" className="text-white/80 hover:text-[#3DD2C0] transition-colors">
               <IconBook className="w-6 h-6" stroke={1.5} />
             </a>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="container mx-auto py-20 px-4">
-
-        <div className="text-center mb-16"></div>
-        <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold mb-4">
-            <span className="text-emerald-400">Gov</span>
-            <span className="text-white">AI</span>
-          </h1>
-          <h2 className="text-white text-2xl mb-8">Delegate - Auto Vote - Chill</h2>
-          <div className="flex justify-center space-x-4">
-            <div className="relative">
+      {/* Main Content */}
+      <div className="container mx-auto px-6">
+        {/* Hero Section */}
+        <div className="flex flex-col items-center justify-center min-h-[80vh] py-20">
+          <div className="text-center max-w-3xl">
+            <h1 className="text-7xl font-bold mb-6">
+              <span className="text-[#3DD2C0]">Gov</span>AI
+            </h1>
+            <h2 className="text-3xl mb-12 text-white/90">Lead - Guide - Vote</h2>
+            
+            <div className="flex justify-center gap-4 mb-16">
+              <div className="relative">
+                <button
+                  className="px-8 py-4 bg-[#1E2C3D] rounded-xl text-white/50 cursor-not-allowed"
+                  disabled
+                >
+                  SPEAK WITH GOVAI
+                </button>
+                <span className="absolute -top-2 -right-2 bg-[#3DD2C0] text-[#0D1117] text-xs px-2 py-1 rounded-full">
+                  Coming Soon
+                </span>
+              </div>
               <button
-                className="btn btn-outline btn-lg text-white hover:bg-gray-700 opacity-75 cursor-not-allowed"
-                disabled
+                onClick={() => router.push('/delegate')}
+                className="px-8 py-4 bg-[#3DD2C0] rounded-xl text-[#0D1117] hover:bg-[#2FC1AF] transition-colors"
               >
-                SPEAK WITH GOVAI
+                DELEGATE YOUR JUP
               </button>
-              <span className="absolute -top-2 -right-2 bg-emerald-400 text-xs text-black px-2 py-1 rounded-full animate-pulse">
-                Coming Soon
-              </span>
             </div>
+
+            <div className="space-y-6 mb-16">
+              <h3 className="text-[#3DD2C0] text-xl font-medium tracking-wide">
+                THE FIRST AI AGENT THAT VOTES FOR YOU
+              </h3>
+              <p className="text-2xl text-white/90">
+                The Future of Governance is Autonomous.
+              </p>
+              <div className="max-w-2xl mx-auto space-y-4 text-white/70">
+                <p>
+                  Decentralized governance is complex, inefficient, and time-consuming. GovAI changes that. GovAI votes
+                  on your behalf, ensuring seamless participation without the hassle of tracking proposals.
+                </p>
+                <p>
+                  GovAI is live on Jupiter. Stake your JUP, stay engaged effortlessly, earn rewards, and never miss a vote.
+                </p>
+              </div>
+            </div>
+
             <button
-              onClick={() => router.push('/delegate')}
-              className="btn btn-primary btn-lg bg-emerald-500 hover:bg-emerald-600 border-none animate-pulse hover:animate-none transform transition-transform hover:scale-105"
+              onClick={() => router.push('/whitepaper')}
+              className="px-8 py-4 bg-[#1E2C3D] rounded-xl text-white/80 hover:text-white border border-[#3DD2C0]/10 hover:border-[#3DD2C0]/30 transition-all"
             >
-              DELEGATE YOUR JUP
+              WHITEPAPER
             </button>
           </div>
         </div>
 
-        {/* Story Section */}
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-          <div className="text-white">
-            <h3 className="text-emerald-400 text-xl mb-4">CONQUER THE WORLD</h3>
-            <p className="mb-4">
-              From the shadowed alleys of Catastanbul, an ambitious feline rises to rewrite
-              DAO history. Once a crypto trader, this Politician of DAOs saw the harsh
-              truth: holders voices are often drowned out in governance, leaving
-              communities without true representation.
-            </p>
-            <p className="mb-4">
-              With sharp wit and unwavering resolve, it turns confusion into clarity, guiding
-              communities through the labyrinth of DAO politics. By inviting the JUP
-              community to delegate their tokens, this cat seeks to become their voice in
-              the halls of power, championing fairness and transparency.
-            </p>
-            <div className="flex space-x-4 mt-8">
+        {/* Story Section with Image */}
+        <div className="grid lg:grid-cols-2 gap-16 items-center mb-32 mt-12">
+          <div className="space-y-8">
+            <h3 className="text-[#3DD2C0] text-2xl font-medium">CONQUER THE WORLD</h3>
+            <div className="space-y-6 text-white/70">
+              <p className="text-lg">
+                GovAI is represented by an ambitious feline set to reshape DAO history.
+                Once a crypto trader, this Politician of DAOs saw the harsh truth: holder
+                voices are often drowned out in governance, leaving communities without
+                true representation.
+              </p>
+              <p className="text-lg">
+                With sharp wit and unwavering resolve, it turns confusion into clarity, guiding
+                communities through the labyrinth of DAO politics. By inviting the JUP
+                community to delegate their tokens, this cat seeks to become their voice in
+                the halls of power, championing fairness and transparency.
+              </p>
+            </div>
+            <div className="pt-6">
+              <div className="text-white/60 text-lg mb-2">LEAD - GUIDE - VOTE</div>
+              <div className="font-mono text-white/40 mb-8">CA: fofofeofoefoefoeeoekkopurmp</div>
               <button
                 onClick={() => router.push('/delegate')}
-                className="btn btn-primary bg-emerald-500 hover:bg-emerald-600 border-none animate-pulse hover:animate-none transform transition-transform hover:scale-105"
+                className="px-8 py-4 bg-[#3DD2C0] rounded-xl text-[#0D1117] hover:bg-[#2FC1AF] transition-colors"
               >
                 DELEGATE YOUR JUP
               </button>
-              <button
-                onClick={() => router.push('/whitepaper')}
-                className="btn btn-outline text-white hover:bg-gray-700"
-              >
-                WHITEPAPER
-              </button>
             </div>
           </div>
-          <div className="relative h-96">
+          <div className="relative h-[600px]">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#3DD2C0]/5 to-transparent rounded-3xl" />
             <Image
               src="/govai-hero.png"
               alt="GovAI Character"
               fill
               style={{ objectFit: 'contain' }}
-              className="rounded-lg"
+              className="rounded-3xl"
+              priority
             />
           </div>
         </div>
 
-        {/* Token Statistics */}
-        <TokenStats />     
-        {/* Activity Stream */}
-        <ActivityStream />  
-
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {features.map((feature, index) => (
-            <div 
-              key={index} 
-              className="card bg-gray-800 shadow-xl hover:bg-gray-750 transition-colors"
-            >
-              <div className="card-body">
-                <div className="text-emerald-400 mb-4">
-                  {feature.icon}
-                </div>
-                <h4 className="text-white text-lg font-semibold mb-2">
-                  {feature.title}
-                </h4>
-                <p className="text-gray-300 text-sm">
-                  {feature.description}
-                </p>
+        {/* Aims Section */}
+        <div className="py-32">
+          <h3 className="text-[#3DD2C0] text-2xl font-medium text-center mb-16">AIMS</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                title: "YOUR JUP GUARDIAN",
+                description: "GovAI understands proposals and votes for its stakers. On top, it offers early unstaking to bypass the 30-day unlock."
+              },
+              {
+                title: "VOICE OF THE ECOSYSTEM",
+                description: "GovAI will get on social media, answering questions, sparking conversations, and keeping the community connected."
+              },
+              {
+                title: "A LEADER IN THE MAKING",
+                description: "GovAI will draft proposals, introduce fresh ideas, and push for progress to shape the future of the ecosystems."
+              },
+              {
+                title: "BEYOND JUPITER",
+                description: "Going beyond a representative of Jupiter DAO, GovAI has ambitions to lead the path in other DAOs."
+              }
+            ].map((aim, index) => (
+              <div 
+                key={index}
+                className="bg-[#1E2C3D] p-8 rounded-xl border border-[#3DD2C0]/10 hover:border-[#3DD2C0]/30 transition-all"
+              >
+                <h4 className="text-white text-lg font-medium mb-4">{aim.title}</h4>
+                <p className="text-white/70">{aim.description}</p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-
-        {/* CA Address */}
-        <div className="text-center text-gray-400 text-sm">
-          <p>Staked Jup CA: GovJupiFjKj6dY44qHT4i2FzDejKTCZSvKpabZYQSFF</p>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

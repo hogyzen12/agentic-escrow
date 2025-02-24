@@ -2,7 +2,6 @@
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useState, useEffect, useMemo } from 'react';
-import TokenStats from '@/components/metrics/TokenStats';
 import {
   PublicKey,
   Transaction,
@@ -21,12 +20,13 @@ import BN from 'bn.js';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useInterval } from '@/hooks/useInterval';
 
-import { TOKEN_X_MINT, TOKEN_Y_MINT, ESCROW_PROGRAM_ID } from '../../utils/constants';
+import { TOKEN_X_MINT, TOKEN_Y_MINT, ESCROW_PROGRAM_ID } from '@/utils/constants';
 import { notify } from '../components/ui/notify';
 import { useGetTokenAccounts, useTokenBalance } from '@/hooks/use-token-accounts';
 import { ESCROW_ACCOUNT_DATA_LAYOUT } from '@/utils/escrow';
+import FAQs from '@/components/metrics/FAQs';
 
-// Utility functions for BN operations
+// Keep all utility functions unchanged
 function parseTokenAmountToBN(amountStr: string, decimals: number): BN {
   const [whole, fraction = ""] = amountStr.split('.');
   const fractionPart = fraction.padEnd(decimals, '0').slice(0, decimals);
@@ -56,16 +56,15 @@ function bnToDecimalString(amountBN: BN, decimals: number, maxFractionDigits = 4
   return decimalStr;
 }
 
-const REFRESH_INTERVAL = 15000;
-
 export default function RedeemPage() {
+  // Keep all state and hooks unchanged
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
   const [unlockDays, setUnlockDays] = useState(30);
   const [govAmount, setGovAmount] = useState<string>("");
 
-  // Token accounts and balances setup
+  // Token accounts and balances setup (unchanged)
   const { data: tokenAccounts, refetch: refetchTokenAccounts } = useGetTokenAccounts({
     address: publicKey,
   });
@@ -84,13 +83,14 @@ export default function RedeemPage() {
     tokenAccount: jupTokenAccount ? new PublicKey(jupTokenAccount.pubkey) : null,
   });
 
+  // Keep all utility functions and handlers unchanged
   const refreshBalances = () => {
     refetchTokenAccounts();
     refetchBalanceGOV();
     refetchBalanceJUP();
   };
 
-  useInterval(refreshBalances, REFRESH_INTERVAL);
+  useInterval(refreshBalances, 6900);
 
   const getRatio = (days: number): number => {
     if (days >= 30) return 1;
@@ -260,45 +260,139 @@ export default function RedeemPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen bg-[#0D1117]">
+      <div className="container mx-auto px-6 py-12">
         <div className="mb-12">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            <span className="text-emerald-400">REDEEM</span> YOUR GOVAI TOKENS
+          <h1 className="text-3xl font-bold mb-4">
+            <span className="text-[#3DD2C0]">REDEEM</span>
+            <span className="text-white"> YOUR GOVAI TOKENS</span>
           </h1>
-          <p className="text-gray-400">
+          <p className="text-white/70">
             Convert your govJUP tokens back to JUP with flexible unlocking periods.
           </p>
         </div>
 
-        {/* Token Statistics */}
-        <TokenStats />  
-
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column - Info and Benefits */}
-          <div className="space-y-6">
-            <div className="text-white space-y-4 bg-gray-800/50 p-6 rounded-xl border border-emerald-400/20">
-              <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Choose your unlock period: instant with a 20% fee, or wait up to 30 days for no fee.</p>
+        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          {/* Redemption Interface */}
+          <div className="bg-[#1E2C3D] rounded-xl p-8 border border-[#3DD2C0]/10">
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <div>
+                <div className="text-white/60">govJUP Balance</div>
+                <div className="text-2xl text-white">{balanceGOV ?? '0.00'}</div>
               </div>
-              <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Early withdrawal fees are distributed to remaining stakers as rewards.</p>
-              </div>
-              <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full mt-2 animate-pulse"></div>
-                <p>Your JUP tokens will be available after the chosen unlock period.</p>
+              <div className="text-right">
+                <div className="text-white/60">JUP Balance</div>
+                <div className="text-2xl text-white">{balanceJUP ?? '0.00'}</div>
               </div>
             </div>
 
-            {/* Info Card */}
-            <div className="bg-gray-800/50 p-6 rounded-xl border border-emerald-400/20">
-              <div className="flex items-start space-x-3">
-                <IconInfoCircle className="text-emerald-400 w-6 h-6 flex-shrink-0 mt-1" />
+            <div className="space-y-6">
+              {/* Amount Input */}
+              <div className="bg-[#2A3B4D] rounded-xl p-4">
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={govAmount}
+                  onChange={(e) => setGovAmount(e.target.value)}
+                  className="w-full bg-transparent text-white text-lg focus:outline-none"
+                  placeholder="0.00"
+                />
+                <div className="text-white/60 text-sm">govJUP</div>
+              </div>
+
+              {/* Unlock Period Slider */}
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-white/60">Unlock Period</span>
+                  <span className="text-white">{unlockDays} days</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="30"
+                  value={unlockDays}
+                  onChange={(e) => setUnlockDays(parseInt(e.target.value))}
+                  className="w-full h-2 bg-[#2A3B4D] rounded-lg appearance-none cursor-pointer accent-[#3DD2C0]"
+                />
+                <div className="flex justify-between text-sm text-white/60 mt-2">
+                  <span>Instant (20% fee)</span>
+                  <span>30 days (0% fee)</span>
+                </div>
+              </div>
+
+              {/* Estimated Return */}
+              <div className="bg-[#2A3B4D] rounded-xl p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-white/60">Estimated Return</span>
+                  <span className="text-xl text-white">{estimatedJUPReturn} JUP</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/60">Rate</span>
+                  <span className="text-[#3DD2C0]">
+                    1 govJUP = {getRatio(unlockDays).toFixed(3)} JUP
+                  </span>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                onClick={handleInitializeUnstake}
+                disabled={
+                  isLoading ||
+                  !publicKey ||
+                  !balanceGOV ||
+                  isNaN(parseFloat(govAmount)) ||
+                  parseFloat(govAmount) <= 0 ||
+                  parseFloat(govAmount) > (balanceGOV || 0)
+                }
+                className={`w-full py-4 rounded-xl text-lg font-medium transition-all
+                  ${isLoading ? 'bg-[#2A3B4D] text-white/50' : 'bg-[#3DD2C0] text-[#0D1117] hover:bg-[#2FC1AF]'}
+                  ${(!publicKey || !balanceGOV || parseFloat(govAmount) > (balanceGOV || 0)) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+                    <span>Processing...</span>
+                  </div>
+                ) : !publicKey ? (
+                  'Connect Wallet'
+                ) : !balanceGOV ? (
+                  'No govJUP Balance'
+                ) : parseFloat(govAmount) > (balanceGOV || 0) ? (
+                  'Insufficient govJUP Balance'
+                ) : (
+                  'INITIALIZE REDEEM'
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Info Section */}
+          <div className="space-y-6">
+            <div className="bg-[#1E2C3D] rounded-xl p-8 border border-[#3DD2C0]/10">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-[#3DD2C0] rounded-full mt-2"></div>
+                  <p className="text-white/70">Choose your unlock period: instant with a 20% fee, or wait up to 30 days for no fee.</p>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-[#3DD2C0] rounded-full mt-2"></div>
+                  <p className="text-white/70">Early withdrawal fees are distributed to remaining stakers as rewards.</p>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-[#3DD2C0] rounded-full mt-2"></div>
+                  <p className="text-white/70">Your JUP tokens will be available after the chosen unlock period.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#1E2C3D] rounded-xl p-8 border border-[#3DD2C0]/10">
+              <div className="flex items-start space-x-4">
+                <IconInfoCircle className="text-[#3DD2C0] w-6 h-6 flex-shrink-0" />
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Understanding Unlock Periods</h3>
-                  <p className="text-gray-400 text-sm">
+                  <h3 className="text-white font-medium mb-2">Understanding Unlock Periods</h3>
+                  <p className="text-white/70">
                     The unlock period determines your redemption rate. Choosing a longer period
                     reduces the fee, with a 30-day period having zero fee. This mechanism helps
                     maintain protocol stability and rewards long-term stakers.
@@ -307,101 +401,10 @@ export default function RedeemPage() {
               </div>
             </div>
           </div>
-
-          {/* Right Column - Redemption Interface */}
-          <div className="bg-gray-800/80 rounded-xl p-6 h-fit border border-emerald-400/20">
-            {/* Token Balances */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <div className="text-gray-400">govJUP Balance</div>
-                <div className="text-2xl text-white">{balanceGOV ?? '0.00'}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-gray-400">JUP Balance</div>
-                <div className="text-2xl text-white">{balanceJUP ?? '0.00'}</div>
-              </div>
-            </div>
-
-            {/* Amount Input */}
-            <div className="form-control mb-6">
-              <div className="flex items-center space-x-2 bg-gray-700/50 rounded-lg p-4 border border-emerald-400/20">
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
-                  value={govAmount}
-                  onChange={(e) => setGovAmount(e.target.value)}
-                  className="bg-transparent text-white text-lg w-full focus:outline-none"
-                  placeholder="0.00"
-                />
-                <span className="text-white">govJUP</span>
-              </div>
-            </div>
-
-            {/* Unlock Period Slider */}
-            <div className="mb-6">
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-400">Unlock Period</span>
-                <span className="text-white">{unlockDays} days</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="30"
-                value={unlockDays}
-                onChange={(e) => setUnlockDays(parseInt(e.target.value))}
-                className="range range-success"
-                step="1"
-              />
-              <div className="flex justify-between text-sm text-gray-400 mt-2">
-                <span>Instant (20% fee)</span>
-                <span>30 days (0% fee)</span>
-              </div>
-            </div>
-
-            {/* Estimated Return */}
-            <div className="bg-gray-700/50 rounded-lg p-4 mb-6 border border-emerald-400/20">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-400">Estimated Return</span>
-                <span className="text-xl text-white">{estimatedJUPReturn} JUP</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Rate</span>
-                <span className="text-emerald-400">
-                  1 govJUP = {getRatio(unlockDays).toFixed(3)} JUP
-                </span>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              onClick={handleInitializeUnstake}
-              disabled={
-                isLoading ||
-                !publicKey ||
-                !balanceGOV ||
-                isNaN(parseFloat(govAmount)) ||
-                parseFloat(govAmount) <= 0 ||
-                parseFloat(govAmount) > (balanceGOV || 0)
-              }
-              className={`w-full btn btn-lg bg-emerald-500 hover:bg-emerald-600 border-none text-lg
-                ${isLoading ? '' : 'animate-pulse hover:animate-none transform transition-transform hover:scale-105'}
-                ${(!publicKey || !balanceGOV || parseFloat(govAmount) > (balanceGOV || 0)) ? 'opacity-50' : ''}`}
-            >
-              {isLoading ? (
-                <span className="loading loading-spinner"></span>
-              ) : !publicKey ? (
-                'Connect Wallet'
-              ) : !balanceGOV ? (
-                'No govJUP Balance'
-              ) : parseFloat(govAmount) > (balanceGOV || 0) ? (
-                'Insufficient govJUP Balance'
-              ) : (
-                'INITIALIZE REDEEM'
-              )}
-            </button>
-          </div>
         </div>
+
+        {/* FAQ Section */}
+        <FAQs />
       </div>
     </div>
   );
