@@ -1,10 +1,10 @@
 'use client';
 
 import { useConnection } from '@solana/wallet-adapter-react';
-import { useState} from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { PublicKey } from '@solana/web3.js';
 import { getAccount } from '@solana/spl-token';
 import {
-  IconArrowUpRight,
   IconChartPie,
   IconWallet,
   IconLock
@@ -13,12 +13,8 @@ import TokenStats from '@/components/metrics/TokenStats';
 import ActivityStream from '@/components/metrics/ActivityStream';
 import {
   STAKED_JUP,
-  VAULT_JUP,
-  GOV_TOKEN,
-  ESCROW_PROGRAM_ID,
-  AGENT_ADDRESS
+  VAULT_JUP
 } from '@/utils/constants';
-import idl from '@/utils/jupiter_staking_idl.json';
 
 interface PendingUnstake {
   address: string;
@@ -55,7 +51,6 @@ const StatsCard: React.FC<StatsCardProps> = ({
   </div>
 );
 
-// Helper: convert seconds into human-readable time remaining.
 function formatTimeRemaining(seconds: number): string {
   if (seconds <= 0) return 'Unlocked';
   const days = Math.floor(seconds / (24 * 3600));
@@ -67,77 +62,85 @@ function formatTimeRemaining(seconds: number): string {
 
 export default function FeedPage() {
   const { connection } = useConnection();
+
   const [stats, setStats] = useState({
-    totalValue: 0,       // Total Value Locked (USD approximation)
-    totalJupStaked: 0,   // Staked JUP
-    vaultJup: 0,         // JUP in the vault
-    delegatedGovJup: 0   // Total minted govJUP
+    totalValue: 0,       // TVL in USD
+    totalJupStaked: 0,   // JUP staked
+    vaultJup: 0,         // JUP in vault (for instant unstaking)
   });
   const [pendingUnstakes, setPendingUnstakes] = useState<PendingUnstake[]>([]);
-  const [agentHoldings, setAgentHoldings] = useState(0);
-  const [circulatingGovJup, setCirculatingGovJup] = useState(0);
 
-  // State to collect debug logs.
+  // Debug logs
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
   const [showDebug, setShowDebug] = useState<boolean>(false);
 
-  // Helper function to add a debug log.
   const addDebugLog = (msg: string) => {
-    setDebugLogs(prev => [...prev, msg]);
+    setDebugLogs((prev) => [...prev, msg]);
     console.debug(msg);
   };
 
-  const fetchStats = async () => {
+  /**
+   * fetchStats
+   * Fetches the current JUP price from jup.ag and the staked/vault balances.
+   */
+  const fetchStats = useCallback(async () => {
     try {
-      // 1) Get govJUP supply.
-      const govTokenSupply = await connection.getTokenSupply(GOV_TOKEN);
-      const totalGovJupRaw =
-        Number(govTokenSupply.value.amount) / 10 ** govTokenSupply.value.decimals;
-
-      // 2) Get Agent’s total govJUP holdings.
-      let totalAgentBalance = 0;
-      const agentAccounts = await connection.getTokenAccountsByOwner(AGENT_ADDRESS, {
-        mint: GOV_TOKEN
-      });
-      if (agentAccounts.value.length > 0) {
-        const balances = await Promise.all(
-          agentAccounts.value.map((a) => connection.getTokenAccountBalance(a.pubkey))
-        );
-        totalAgentBalance = balances.reduce((sum, b) => sum + Number(b.value.amount), 0);
-        totalAgentBalance /= 10 ** govTokenSupply.value.decimals;
+      if (!connection) {
+        addDebugLog('No valid connection yet.');
+        return;
       }
 
-      // "Circulating" = total minted - agent holdings.
-      const circ = totalGovJupRaw - totalAgentBalance;
+      // 1) Fetch the current JUP price
+      const priceRes = await fetch(
+        'https://api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112'
+      );
+      const priceJson = await priceRes.json();
 
-      // 3) Get JUP staked & vault balances.
-      const [stakedAccount, vaultAccount] = await Promise.all([
-        getAccount(connection, STAKED_JUP),
-        getAccount(connection, VAULT_JUP)
-      ]);
-      const stakedBalance = Number(stakedAccount.amount) / 1e6;
-      const vaultBalance = Number(vaultAccount.amount) / 1e6;
+      // If the JUP price is missing, fallback to 0
+      const jupPriceStr = priceJson.data?.['JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN']?.price;
+      const jupPrice = jupPriceStr ? parseFloat(jupPriceStr) : 0;
+
+      // 2) Attempt to get staked JUP & vault JUP
+      // If these token accounts do not exist on the network you're connected to, 
+      // getAccount() will throw an error or return 0.
+      let stakedBalance = 0;
+      let vaultBalance = 0;
+
+      try {
+        const stakedAccount = await getAccount(connection, STAKED_JUP);
+        stakedBalance = Number(stakedAccount.amount) / 1e6;
+      } catch (err) {
+        addDebugLog(`Could not find STAKED_JUP account: ${err}`);
+      }
+
+      try {
+        const vaultAccount = await getAccount(connection, VAULT_JUP);
+        vaultBalance = Number(vaultAccount.amount) / 1e6;
+      } catch (err) {
+        addDebugLog(`Could not find VAULT_JUP account: ${err}`);
+      }
+
+      // 3) Compute TVL = stakedBalance * jupPrice
+      const tvl = stakedBalance * jupPrice;
 
       setStats({
-        totalValue: stakedBalance,
+        totalValue: tvl,
         totalJupStaked: stakedBalance,
-        vaultJup: vaultBalance,
-        delegatedGovJup: totalGovJupRaw
+        vaultJup: vaultBalance
       });
-      setAgentHoldings(totalAgentBalance);
-      setCirculatingGovJup(circ);
-      addDebugLog(`Stats fetched: staked=${stakedBalance}, vault=${vaultBalance}, totalGovJup=${totalGovJupRaw}`);
+
+      addDebugLog(
+        `Stats fetched -> staked=${stakedBalance}, vault=${vaultBalance}, jupPrice=${jupPrice}, TVL=${tvl}`
+      );
     } catch (error) {
       addDebugLog(`Error fetching stats: ${error}`);
     }
-  };
+  }, [connection]);
 
-
-  // Compute Return on Delegation: (Total JUP Staked / Circulating govJUP) - 1.
-  let returnOnDelegation = 0;
-  if (circulatingGovJup > 0) {
-    returnOnDelegation = stats.totalJupStaked / circulatingGovJup - 1;
-  }
+  // Run fetchStats on component mount (and whenever connection changes)
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   return (
     <div className="min-h-screen bg-[#0D1117]">
@@ -153,69 +156,37 @@ export default function FeedPage() {
           </p>
         </div>
 
-        {/* Top row stats */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {/* Top row stats (3 columns) */}
+        <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-6 mb-12">
           <StatsCard
             title="Total Value Locked"
-            value={`$${stats.totalValue.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}`}
+            value={`$${stats.totalValue.toLocaleString(undefined, {
+              minimumFractionDigits: 3,
+              maximumFractionDigits: 3
+            })}`}
             subtitle="Based on current JUP price"
             icon={<IconChartPie size={24} />}
           />
           <StatsCard
             title="Total JUP Staked"
-            value={stats.totalJupStaked.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}
+            value={stats.totalJupStaked.toLocaleString(undefined, {
+              minimumFractionDigits: 3,
+              maximumFractionDigits: 3
+            })}
             suffix="JUP"
             subtitle="Currently earning rewards"
             icon={<IconWallet size={24} />}
           />
           <StatsCard
-            title="Available in Vault"
-            value={stats.vaultJup.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}
+            title="Available for Instant Unstaking"
+            value={stats.vaultJup.toLocaleString(undefined, {
+              minimumFractionDigits: 3,
+              maximumFractionDigits: 3
+            })}
             suffix="JUP"
-            subtitle="For early unstaking"
+            subtitle="Vault reserves"
             icon={<IconLock size={24} />}
           />
-          <StatsCard
-            title="Pending Unstakes"
-            value={pendingUnstakes.length}
-            subtitle="Processing in 30-day window"
-            icon={<IconArrowUpRight size={24} />}
-          />
-        </div>
-
-        {/* Expanded Return on Delegation */}
-        <div className="grid gap-6 mb-12">
-          <div className="bg-[#1E2C3D] rounded-xl p-6">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-white/60 text-sm">Return on Delegation</div>
-              {circulatingGovJup > 0 ? (
-                <div className="text-[#3DD2C0] text-sm font-semibold">
-                  {(returnOnDelegation * 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
-                </div>
-              ) : (
-                <div className="text-white text-sm">No delegation data</div>
-              )}
-            </div>
-            {circulatingGovJup > 0 && (
-              <>
-                <div className="w-full bg-gray-800 rounded-full h-2.5 mb-4">
-                  <div
-                    className="bg-gradient-to-r from-green-400 to-blue-500 h-2.5 rounded-full"
-                    style={{ width: `${Math.min(100, (returnOnDelegation + 1) * 100)}%` }}
-                  ></div>
-                </div>
-                <div className="text-white text-sm">
-                  <span className="font-medium">Delegation Efficiency: </span>
-                  {returnOnDelegation >= 0
-                    ? 'Staked tokens are earning above the baseline!'
-                    : 'Staked tokens are below the expected 1:1 backing.'}
-                </div>
-              </>
-            )}
-            <div className="text-white/40 text-xs mt-2">
-              Calculated as (Total JUP Staked / Circulating govJUP) - 1
-            </div>
-          </div>
         </div>
 
         {/* Slimmed-down Token Stats */}
@@ -223,7 +194,7 @@ export default function FeedPage() {
           <TokenStats />
         </div>
 
-        {/* Detailed Pending Unstakes */}
+        {/* Detailed Pending Unstakes (if any) */}
         {pendingUnstakes.length > 0 && (
           <div className="mb-12 bg-[#1E2C3D] rounded-xl p-6">
             <h2 className="text-white/60 text-sm mb-4">Pending Unstakes (detailed)</h2>

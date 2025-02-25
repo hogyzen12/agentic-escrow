@@ -4,12 +4,68 @@ import { useRouter } from 'next/navigation';
 import { 
   IconBrandGithub, 
   IconBrandTwitter, 
-  IconBook
+  IconBook,
+  IconCpu,
+  IconLock,
+  IconTerminal,
+  IconClock,
+  IconBrain,
+  IconBrandTwitter as IconTwitter,
+  IconMessageCircle2,
+  IconShieldCheck
 } from '@tabler/icons-react';
 import Image from 'next/image';
 
 export default function LandingPage() {
   const router = useRouter();
+
+  // Data for Completed Features
+  const completedFeatures = [
+    {
+      title: 'Agent Frontend',
+      description: 'A sleek, user-friendly dashboard for delegating votes, managing stakes, and monitoring GovAI’s governance actions in real-time.',
+      icon: IconCpu
+    },
+    {
+      title: 'Escrow from Participants',
+      description: 'A trustless mechanism that securely holds your staked tokens while GovAI executes votes on your behalf, ensuring your assets remain protected.',
+      icon: IconLock
+    },
+    {
+      title: 'Jupiter DAO CLI Toolkit',
+      description: 'A robust command-line tool that simplifies interactions with the Jupiter DAO, perfect for power users and developers.',
+      icon: IconTerminal
+    },
+    {
+      title: 'Instant Unstaking',
+      description: 'Need liquidity? Exit your stake on a user-defined schedule for a fee, maintaining flexibility without sacrificing your ASR rewards.',
+      icon: IconClock
+    }
+  ];
+
+  // Data for Upcoming Features
+  const upcomingFeatures = [
+    {
+      title: 'Chain of Thought',
+      description: 'GovAI will showcase its reasoning step-by-step, giving you full insight into how and why each vote is cast.',
+      icon: IconBrain
+    },
+    {
+      title: 'Twitter Integration',
+      description: 'GovAI will post updates, gather community sentiment, and stay connected with token holders in real time on social media.',
+      icon: IconTwitter
+    },
+    {
+      title: 'Sentiment Parsing',
+      description: 'Real-time analysis of community feedback to inform GovAI’s voting decisions and ensure its actions remain aligned with token holder sentiment.',
+      icon: IconMessageCircle2
+    },
+    {
+      title: 'Non-custodial Delegation & Agentic Governance',
+      description: 'Delegate your votes without relinquishing control of your tokens. This feature paves the way for Agentic Governance as a Service, letting GovAI represent multiple DAOs seamlessly.',
+      icon: IconShieldCheck
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-[#0D1117] text-white">
@@ -49,7 +105,7 @@ export default function LandingPage() {
                   className="px-8 py-4 bg-[#1E2C3D] rounded-xl text-white/50 cursor-not-allowed"
                   disabled
                 >
-                  SPEAK WITH GOVAI
+                  CHAIN OF THOUGHT
                 </button>
                 <span className="absolute -top-2 -right-2 bg-[#3DD2C0] text-[#0D1117] text-xs px-2 py-1 rounded-full">
                   Coming Soon
@@ -72,11 +128,13 @@ export default function LandingPage() {
               </p>
               <div className="max-w-2xl mx-auto space-y-4 text-white/70">
                 <p>
-                  Decentralized governance is complex, inefficient, and time-consuming. GovAI changes that. GovAI votes
-                  on your behalf, ensuring seamless participation without the hassle of tracking proposals.
+                  Decentralized governance is complex and time-consuming. GovAI votes on your behalf,
+                  ensuring you never miss a proposal or a reward. 
                 </p>
                 <p>
-                  GovAI is live on Jupiter. Stake your JUP, stay engaged effortlessly, earn rewards, and never miss a vote.
+                  GovAI is live on Jupiter. Stake your JUP, earn rewards, set your own unstaking
+                  timeframe for a fee, and let GovAI handle the voting. It’s straightforward, secure, 
+                  and built for the next era of DAO participation.
                 </p>
               </div>
             </div>
@@ -93,24 +151,23 @@ export default function LandingPage() {
         {/* Story Section with Image */}
         <div className="grid lg:grid-cols-2 gap-16 items-center mb-32 mt-12">
           <div className="space-y-8">
-            <h3 className="text-[#3DD2C0] text-2xl font-medium">CONQUER THE WORLD</h3>
+            <h3 className="text-[#3DD2C0] text-2xl font-medium">MEET GOVAI</h3>
             <div className="space-y-6 text-white/70">
               <p className="text-lg">
-                GovAI is represented by an ambitious feline set to reshape DAO history.
-                Once a crypto trader, this Politician of DAOs saw the harsh truth: holder
-                voices are often drowned out in governance, leaving communities without
-                true representation.
+                GovAI is an advanced AI agent that interprets governance proposals, automates voting,
+                and gives you flexibility with a user-defined unstaking window. You still earn Jupiter
+                stake rewards (ASR), but now you can exit anytime you want by paying a small fee.
               </p>
               <p className="text-lg">
-                With sharp wit and unwavering resolve, it turns confusion into clarity, guiding
-                communities through the labyrinth of DAO politics. By inviting the JUP
-                community to delegate their tokens, this cat seeks to become their voice in
-                the halls of power, championing fairness and transparency.
+                Our goal is to become a leading “DAO politician,” championing <em>agentic governance</em>
+                across multiple ecosystems. The first term for GovAI will last around three months,
+                aligning with Jupiter’s voting cycle. For deeper technical details, visit our GitHub
+                and GitBook.
               </p>
             </div>
             <div className="pt-6">
               <div className="text-white/60 text-lg mb-2">LEAD - GUIDE - VOTE</div>
-              <div className="font-mono text-white/40 mb-8">CA: fofofeofoefoefoeeoekkopurmp</div>
+              <div className="font-mono text-white/40 mb-8">CA: THERE IS NO TOKEN !!!</div>
               <button
                 onClick={() => router.push('/delegate')}
                 className="px-8 py-4 bg-[#3DD2C0] rounded-xl text-[#0D1117] hover:bg-[#2FC1AF] transition-colors"
@@ -131,37 +188,54 @@ export default function LandingPage() {
             />
           </div>
         </div>
+      </div>
 
-        {/* Aims Section */}
-        <div className="py-32">
-          <h3 className="text-[#3DD2C0] text-2xl font-medium text-center mb-16">AIMS</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                title: "YOUR JUP GUARDIAN",
-                description: "GovAI understands proposals and votes for its stakers. On top, it offers early unstaking to bypass the 30-day unlock."
-              },
-              {
-                title: "VOICE OF THE ECOSYSTEM",
-                description: "GovAI will get on social media, answering questions, sparking conversations, and keeping the community connected."
-              },
-              {
-                title: "A LEADER IN THE MAKING",
-                description: "GovAI will draft proposals, introduce fresh ideas, and push for progress to shape the future of the ecosystems."
-              },
-              {
-                title: "BEYOND JUPITER",
-                description: "Going beyond a representative of Jupiter DAO, GovAI has ambitions to lead the path in other DAOs."
-              }
-            ].map((aim, index) => (
-              <div 
-                key={index}
-                className="bg-[#1E2C3D] p-8 rounded-xl border border-[#3DD2C0]/10 hover:border-[#3DD2C0]/30 transition-all"
-              >
-                <h4 className="text-white text-lg font-medium mb-4">{aim.title}</h4>
-                <p className="text-white/70">{aim.description}</p>
-              </div>
-            ))}
+      {/* Features Section: with a gradient background & floating glow */}
+      <div className="relative bg-gradient-to-b from-[#14181F] to-[#0D1117] overflow-hidden py-32">
+        {/* Subtle glowing orb in background */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[700px] h-[700px] bg-[#3DD2C0]/20 rounded-full blur-3xl opacity-50" />
+        
+        <div className="relative z-10 container mx-auto px-6">
+          <h2 className="text-[#3DD2C0] text-2xl font-medium text-center mb-16">
+            FEATURES
+          </h2>
+
+          {/* Completed Features */}
+          <div className="mb-12">
+            <h3 className="text-xl text-white font-semibold mb-6">COMPLETED</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {completedFeatures.map(({ title, description, icon: Icon }, idx) => (
+                <div
+                  key={idx}
+                  className="relative bg-[#1E2C3D]/80 p-8 rounded-xl border border-[#3DD2C0]/10
+                             hover:border-[#3DD2C0]/30 transition-all shadow-lg 
+                             hover:shadow-[#3DD2C0]/50 hover:-translate-y-1"
+                >
+                  <Icon className="w-10 h-10 text-[#3DD2C0] mb-4" stroke={1.2} />
+                  <h4 className="text-white text-lg font-medium mb-4">{title}</h4>
+                  <p className="text-white/70">{description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Upcoming Features */}
+          <div>
+            <h3 className="text-xl text-white font-semibold mb-6">UPCOMING</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {upcomingFeatures.map(({ title, description, icon: Icon }, idx) => (
+                <div
+                  key={idx}
+                  className="relative bg-[#1E2C3D]/80 p-8 rounded-xl border border-[#3DD2C0]/10
+                             hover:border-[#3DD2C0]/30 transition-all shadow-lg 
+                             hover:shadow-[#3DD2C0]/50 hover:-translate-y-1"
+                >
+                  <Icon className="w-10 h-10 text-[#3DD2C0] mb-4" stroke={1.2} />
+                  <h4 className="text-white text-lg font-medium mb-4">{title}</h4>
+                  <p className="text-white/70">{description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
