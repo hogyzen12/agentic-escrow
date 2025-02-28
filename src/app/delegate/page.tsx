@@ -35,7 +35,7 @@ import FAQs from '@/components/metrics/FAQs';
 const MAX_STAKE_AMOUNT = 41990;
 
 // Staking window end date
-const STAKING_END_DATE = new Date('2025-02-28T00:00:00Z');
+const STAKING_END_DATE = new Date('2025-03-08T00:00:00Z');
 
 function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState('');
