@@ -179,7 +179,7 @@ export default function LandingPage() {
           <div className="relative h-[600px]">
             <div className="absolute inset-0 bg-gradient-to-br from-[#3DD2C0]/5 to-transparent rounded-3xl" />
             <Image
-              src="/govai-hero.png"
+              src="/govai-avatar.png"
               alt="GovAI Character"
               fill
               style={{ objectFit: 'contain' }}

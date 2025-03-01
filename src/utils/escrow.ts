@@ -40,38 +40,3 @@ export interface Escrow {
   expectedAmount: number;
   bobExpectedAmount: number;
 }
-
-// Get the escrow account from the saved public key
-export async function getEscrowAccount(connection: Connection): Promise<Escrow | null> {
-  try {
-    // Get the escrow public key from the json file
-    const escrowPubkey = new PublicKey("4u91rieF77UwVnQjP7WK3K8ZpDP7kvMnXscC7KYvHnw5");
-    
-    const account = await connection.getAccountInfo(escrowPubkey);
-    if (!account) {
-      console.log('No escrow account found');
-      return null;
-    }
-
-    console.log('Found escrow account:', escrowPubkey.toString());
-
-    const decoded = ESCROW_ACCOUNT_DATA_LAYOUT.decode(account.data) as EscrowLayout;
-
-    // This matches bob.ts expectations
-    const expectedAmount = new BN(decoded.expectedAmount, 'le').toNumber();
-    const bobExpectedAmount = 5; // From terms.json
-
-    return {
-      pubkey: escrowPubkey.toString(),
-      isInitialized: !!decoded.isInitialized,
-      initializer: new PublicKey(decoded.initializerPubkey).toString(),
-      tempTokenAccount: new PublicKey(decoded.initializerTempTokenAccountPubkey).toString(),
-      receivingTokenAccount: new PublicKey(decoded.initializerReceivingTokenAccountPubkey).toString(),
-      expectedAmount: expectedAmount,
-      bobExpectedAmount: bobExpectedAmount
-    };
-  } catch (error) {
-    console.error('Error fetching escrow account:', error);
-    return null;
-  }
-}

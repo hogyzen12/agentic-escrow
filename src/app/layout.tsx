@@ -13,6 +13,7 @@ const links: { label: string; path: string }[] = [
   { label: 'Delegate', path: '/delegate' },
   { label: 'Redeem', path: '/redeem' },
   { label: 'Feed', path: '/feed' },
+  { label: 'Trustless Delegation', path: '/trustless' },
 ]
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
