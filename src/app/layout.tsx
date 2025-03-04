@@ -10,10 +10,10 @@ export const metadata = {
 }
 
 const links: { label: string; path: string }[] = [
-  { label: 'Delegate', path: '/delegate' },
-  { label: 'Redeem', path: '/redeem' },
-  { label: 'Feed', path: '/feed' },
-  { label: 'Trustless Delegation', path: '/trustless' },
+  { label: 'Delegate JUP', path: '/delegate' },
+  { label: 'Unstake govJUP', path: '/redeem' },
+  { label: 'Dashboard', path: '/feed' },
+  { label: 'Delegate Staked JUP voting rights', path: '/trustless' },
 ]
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

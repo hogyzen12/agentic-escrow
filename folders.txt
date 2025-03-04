@@ -1,0 +1,47 @@
+.
+├── LICENSE
+├── README.md
+├── folders.txt
+├── next-env.d.ts
+├── next.config.mjs
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── public
+│   ├── govai-avatar.png
+│   └── logo.png
+├── src
+│   ├── app
+│   │   ├── account
+│   │   ├── api
+│   │   ├── components
+│   │   ├── delegate
+│   │   ├── favicon.ico
+│   │   ├── feed
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── react-query-provider.tsx
+│   │   ├── redeem
+│   │   └── trustless
+│   ├── components
+│   │   ├── GovAIDelegatorsLeaderboard.tsx
+│   │   ├── account
+│   │   ├── cluster
+│   │   ├── metrics
+│   │   ├── solana
+│   │   ├── ui
+│   │   └── useDelegationStatus.ts
+│   ├── hooks
+│   │   ├── use-token-accounts.ts
+│   │   ├── useGovAIDelegators.ts
+│   │   └── useInterval.ts
+│   └── utils
+│       ├── constants.ts
+│       ├── escrow.ts
+│       ├── idl.json
+│       └── idl_gov.json
+├── tailwind.config.ts
+└── tsconfig.json
+
+19 directories, 26 files
