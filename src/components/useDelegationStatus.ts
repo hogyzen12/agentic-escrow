@@ -1,15 +1,16 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { PublicKey, Connection } from '@solana/web3.js';
-import { BorshInstructionCoder } from '@coral-xyz/anchor';
-import { Idl as SerumIdl } from '@project-serum/anchor'; // Use @project-serum/anchor's Idl
+import { BorshInstructionCoder } from '@project-serum/anchor';
 import { Buffer } from 'buffer';
-import bs58 from 'bs58';
+import * as bs58 from 'bs58';
 import idlLockedVoter from '@/utils/idl.json'; // Locked Voter IDL
 import idlGov from '@/utils/idl_gov.json'; // Governance IDL
 
 // Constants
-const LOCKED_VOTER_PROGRAM_ID = new PublicKey('voTpe3tHQ7AjQHMapgSue2HJFAh2cGsdokqN3XqmVSj');
+const LOCKED_VOTER_PROGRAM_ID = new PublicKey(
+  'voTpe3tHQ7AjQHMapgSue2HJFAh2cGsdokqN3XqmVSj'
+);
 const BASE_KEY = new PublicKey('bJ1TRoFo2P6UHVwqdiipp6Qhp2HaaHpLowZ5LHet8Gm');
 const GOV_AI_PUBKEY = new PublicKey('govAiNGS59yJfvqdmvYb7Lzk7wUHYygqiKR58Z1VCag');
 const GOV_PROGRAM_ID = new PublicKey('GovaE4iu227srtG2s3tZzB4RmWBzw8sTwrCLZz7kN7rY');
@@ -54,7 +55,9 @@ export function useDelegationStatus(publicKey: PublicKey | null, connection: Con
           mint: new PublicKey('JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN'), // JUP token mint
         });
         if (tokenAccounts.value.length > 0) {
-          const tokenAccountInfo = await connection.getTokenAccountBalance(tokenAccounts.value[0].pubkey);
+          const tokenAccountInfo = await connection.getTokenAccountBalance(
+            tokenAccounts.value[0].pubkey
+          );
           stakedAmount = tokenAccountInfo.value.uiAmount || 0;
         }
       }
@@ -92,13 +95,14 @@ export function useDelegationStatus(publicKey: PublicKey | null, connection: Con
     fetchData();
   }, [fetchData]);
 
-  const fetchEscrowActivity = async (escrowAddress: PublicKey, connection: Connection): Promise<Activity[]> => {
+  const fetchEscrowActivity = async (
+    escrowAddress: PublicKey,
+    connection: Connection
+  ): Promise<Activity[]> => {
     const sigs = await connection.getSignaturesForAddress(escrowAddress, { limit: 100 });
     const activityList: Activity[] = [];
-
-    // Cast the IDL to satisfy BorshInstructionCoder's expected type
-    const lockedVoterCoder = new BorshInstructionCoder(idlLockedVoter as unknown as import('@coral-xyz/anchor').Idl);
-    const govCoder = new BorshInstructionCoder(idlGov as unknown as import('@coral-xyz/anchor').Idl);
+    const lockedVoterCoder = new BorshInstructionCoder(idlLockedVoter as any);
+    const govCoder = new BorshInstructionCoder(idlGov as any);
 
     for (const sigInfo of sigs) {
       const tx = await connection.getParsedTransaction(sigInfo.signature, {
@@ -112,7 +116,7 @@ export function useDelegationStatus(publicKey: PublicKey | null, connection: Con
       const instructions = tx.transaction.message.instructions;
       for (const ix of instructions) {
         if ('data' in ix) {
-          const decodedData = Buffer.from(bs58.decode(ix.data)); // Convert Uint8Array to Buffer
+          const decodedData = Buffer.from(bs58.decode(ix.data));
           let decoded;
           if (ix.programId.equals(LOCKED_VOTER_PROGRAM_ID)) {
             decoded = lockedVoterCoder.decode(decodedData);
