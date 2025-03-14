@@ -112,7 +112,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <button
-                onClick={() => router.push('/delegate')}
+                onClick={() => router.push('/trustless')}
                 className="px-8 py-4 bg-[#3DD2C0] rounded-xl text-[#0D1117] hover:bg-[#2FC1AF] transition-colors"
               >
                 DELEGATE YOUR JUP
@@ -138,13 +138,6 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
-
-            <button
-              onClick={() => router.push('/whitepaper')}
-              className="px-8 py-4 bg-[#1E2C3D] rounded-xl text-white/80 hover:text-white border border-[#3DD2C0]/10 hover:border-[#3DD2C0]/30 transition-all"
-            >
-              WHITEPAPER
-            </button>
           </div>
         </div>
 
@@ -169,7 +162,7 @@ export default function LandingPage() {
               <div className="text-white/60 text-lg mb-2">LEAD - GUIDE - VOTE</div>
               <div className="font-mono text-white/40 mb-8">CA: THERE IS NO TOKEN !!!</div>
               <button
-                onClick={() => router.push('/delegate')}
+                onClick={() => router.push('/trustless')}
                 className="px-8 py-4 bg-[#3DD2C0] rounded-xl text-[#0D1117] hover:bg-[#2FC1AF] transition-colors"
               >
                 DELEGATE YOUR JUP
