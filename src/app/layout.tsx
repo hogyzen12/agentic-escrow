@@ -10,9 +10,9 @@ export const metadata = {
 }
 
 const links: { label: string; path: string }[] = [
-  { label: 'Delegate JUP', path: '/delegate' },
-  { label: 'Unstake govJUP', path: '/redeem' },
-  { label: 'Dashboard', path: '/feed' },
+  //{ label: 'Delegate JUP', path: '/delegate' },
+  //{ label: 'Unstake govJUP', path: '/redeem' },
+  //{ label: 'Dashboard', path: '/feed' },
   { label: 'Delegate Staked JUP voting rights', path: '/trustless' },
 ]
 

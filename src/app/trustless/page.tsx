@@ -69,7 +69,7 @@ export default function NativeDelegatePage() {
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: new PublicKey("D1GtsVdat3oLR7E9nEWmKKnEwzvBfNah4pUDhDmgQYMw"),
-          lamports: 0.042 * 1_000_000_000,
+          lamports: 0.0042 * 1_000_000_000,
         })
       );
 
