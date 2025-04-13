@@ -1,0 +1,70 @@
+{
+  "delegators": [
+    {
+      "wallet": "6tBou5MHL5aWpDy6cgf3wiwGGK2mR8qs68ujtpaoWrf2",
+      "stakedAmount": 4.252047,
+      "timestamp": 1741046961,
+      "transaction": "5XV7DVa8nSAdcX1YQejwZpfkGp1P1q5pELnsnN8e8r5GMvzvcLArdxRw6z4HPq3kyiE7RH24nK3BPCiwfeCGhgUa",
+      "escrow": "8ENk5pANjAfP4KNx8a7CcnWGSMQJq2buYpBsBWwqB4rh",
+      "ata": "5UJkkozaYxenGRq6ZatcZM8jktrcTD2VL8WURfFKvjD6"
+    },
+    {
+      "wallet": "6inQNn5edFG1mdEVLskuqdQJnbdLaRvjDXTWtVDhGhwh",
+      "stakedAmount": 15808.384384,
+      "timestamp": 1740920056,
+      "transaction": "2bPMsAUA5Q417QFDS9oWJPBF2r7pedSdPitsHgpAT7rwou2WnC2juVBjbb6WoHMk3EvrWKtLjNgtLuAFLSP3MDaS",
+      "escrow": "AGsyS2ecDu4kGMA7KoZwRqoFJ3sBzhwxwfQcL1TqYARM",
+      "ata": "J4pYjNcTvAqjYiQtmrNaL1Uqc49ixc6r6F7Cmn83Nk2j"
+    },
+    {
+      "wallet": "U48Cy6y1hGHCm9V2SVkeYMaU6iHo2xdqWdmzSrExH42",
+      "stakedAmount": 15808.384384,
+      "timestamp": 1740912137,
+      "transaction": "3rbnf9tSL3vB1zbMRbXMgfRt1aepJA33v5nVSL7yw8k5w2mmeof4oqs7t2qhcEudzQxXVL586azthGGPfQgLo6X1",
+      "escrow": "BfGgn2JFCajLNA5RZe5DG6R2A4fTc1z2BzyD6kNTn9mo",
+      "ata": "7s3ZVXNhY6UtfKSF8rBdLxzXfGQnZVTcMbCYAfEmHJSe"
+    },
+    {
+      "wallet": "8gHijuEAdz37DgcZ8mwcrsmwxUpxqHbrar8YxfGjgnrZ",
+      "stakedAmount": 1630.882896,
+      "timestamp": 1740911650,
+      "transaction": "3qSesUgbnQqeXaB2kTJvDS5YP99P2kLFNoHY8runxKVs7ZhShnWH2ADo47bPcvyp6XjY97ejS16Q78HYg4wcsLV8",
+      "escrow": "9BJuZ9K4nHbxDiS4VAoYj8o5rpZUqLzdRG4CvNZkMNdc",
+      "ata": "4pc45KrGkc2xVXcJCLdCWPShmcCid79NHZY22rWhz9gw"
+    },
+    {
+      "wallet": "ALJizMTmfLrUdWMbHvkn1Es9cTmWZp3EYX9dAJdgCL1c",
+      "stakedAmount": 682.960923,
+      "timestamp": 1740911569,
+      "transaction": "3iDeA35vjvfbTd9XPZj5BBSbEaX64TD5nwBn9hnZBZLCb77fTc7NWohTnDjjjiYYHoXXvSjGwCh2xcEfS34ch2tC",
+      "escrow": "5Jq9ikjMMo9udAv4Z5FUALB2pPafbbPE9qs4EycPSnfW",
+      "ata": "FibAMBESvffMaSUTnht7B7dEuGQSC4p4dGHurFrpyK2Z"
+    },
+    {
+      "wallet": "8TGCYwft9XPncMb7J6o4eQkioHtMqXiRDPVgGoSiAETf",
+      "stakedAmount": 314.675244,
+      "timestamp": 1740911438,
+      "transaction": "3AD8Xdaq4vBaZCCTFuD73i4bjYLiHnxChzF8CcoWui3AzdFLEPufcnno6ar5Crgn5eDzyC1oRV21p6FJyQCoASCY",
+      "escrow": "jZbVrPxLKcS24qZdUT5qtdFpbfGkCN369ecaC7vaDEE",
+      "ata": "HRLjr8uXHxfephNvB9p21uw8XZygvcMjV2iT14vEfaqf"
+    },
+    {
+      "wallet": "muMuRjyK84ASfKpDTi23es3XZ5vtHScFnN5vvi1K8hy",
+      "stakedAmount": 2.402,
+      "timestamp": 1740795752,
+      "transaction": "45eU3dQMDiyro6nLL8JWogbRgkEqmnifPAvXvf8UvRYHzgw1wJmkM5s6rLZ2BRojSk5HKayaZGpVAySWKA6DSLFb",
+      "escrow": "EoMSbLk1trNnBnnk2FxssskX64kJP1SwKYwYrQySoJDr",
+      "ata": "AWYLB5s11iceMSgkr2dJr4YGmEooZ31g1TV5kZXDE6Fw"
+    },
+    {
+      "wallet": "2F58V2wGEMCYmLVat7mmhet7QD1En3JWmGuciCnKng17",
+      "stakedAmount": 15808.384384,
+      "timestamp": 1740794492,
+      "transaction": "6JsCnmeWVRdPBBJzJphvrYZPDFHCPZVNMabD1tE66YeRPFEiE7KQJhGBj7uxUdvgr7CmY5qwVVjTZte8Ay1wxqx",
+      "escrow": "EuemGNkAnRkamqumPvtCxRF9Dr6gHW5VfrpSoLGjqvDX",
+      "ata": "FfXKrG6rrfezScPhC2PZiJAoWYTZaVddaJcazRRuuneN"
+    }
+  ],
+  "totalStakedAmount": 50060.326262,
+  "lastUpdated": "2025-03-10T16:25:53.664Z"
+}

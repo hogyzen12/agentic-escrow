@@ -1,0 +1,160 @@
+newLocker
+Creates a new Locker.
+Initializes a new Locker account which groups together Escrow accounts.
+
+newEscrow
+Creates a new Escrow for an account.
+Sets up an Escrow where tokens are locked in exchange for voting rights.
+
+increaseLockedAmount
+Increase locked amount [Escrow].
+Adds additional tokens to an existing Escrow, increasing the staked amount.
+
+extendLockDuration
+Extend locked duration [Escrow].
+Extends the time period for which the tokens remain locked in an Escrow.
+
+toggleMaxLock
+Toggle max lock [Escrow].
+Switches the maximum lock flag on or off for an Escrow.
+
+withdraw
+Exits the DAO; i.e., withdraws all staked tokens in an Escrow if the Escrow is unlocked.
+Allows the owner to withdraw their tokens when the escrow is no longer locked.
+
+activateProposal
+Activates a proposal in token launch phase.
+Moves a proposal from a preliminary stage into an active voting phase.
+
+castVote
+Casts a vote.
+Uses an Escrow’s voting power to vote on a proposal.
+
+setVoteDelegate
+Delegate escrow vote.
+Updates the Escrow so that a different account (delegate) can cast votes on behalf of the owner.
+
+setLockerParams
+Set locker params.
+Updates the configurable parameters of a Locker.
+
+openPartialUnstaking
+Open partial unstaking.
+Initiates a process for unstaking only a portion of the tokens locked in an Escrow.
+
+mergePartialUnstaking
+Merge partial unstaking.
+Combines partial unstaking accounts into one.
+
+withdrawPartialUnstaking
+Withdraw partial unstaking.
+Withdraws tokens from a partial unstaking account once the unstaking period has ended.
+
+createGovernor
+– Creates a [Governor].
+Initializes a new Governor account. This involves setting up the DAO’s central governance structure by linking a locker (voting body) and a smart wallet (which executes proposals), and configuring governance parameters.
+
+createProposal
+– Creates a [Proposal].
+Allows anyone to create a proposal. Note that a proposal won’t take effect until it’s activated. This instruction records details such as the proposal type, maximum number of options, and the set of instructions that will be executed if the proposal passes.
+
+activateProposal
+– Activates a proposal.
+Transitions a proposal from a draft to an active state, enabling voting. This is typically restricted to a specific voter (often the Governor’s designated voter) to ensure only authorized users can trigger the activation process.
+
+cancelProposal
+– Cancels a proposal.
+Allows the creator (proposer) to cancel a proposal that is still in draft mode. This prevents further voting or execution if circumstances change.
+
+queueProposal
+– Queues a proposal for execution.
+Once a proposal has passed the voting phase, this instruction queues it for execution by the smart wallet. It involves creating a transaction account that the smart wallet will later process.
+
+newVote
+– Creates a new [Vote].
+Any user can call this to register a vote on a proposal. It sets up a new vote account linked to a proposal.
+
+setVote
+– Sets a [Vote] weight and side.
+This instruction allows the designated voter (from the Governor) to assign a vote’s side (for, against, abstain) and weight. This ensures that votes are recorded with the proper influence based on the voter’s staked power.
+
+setGovernanceParams
+– Sets the [GovernanceParameters].
+Updates the parameters that govern proposal timings, quorum requirements, and other governance settings. This action is restricted to the smart wallet associated with the Governor.
+
+setVotingReward
+– Sets Voting Reward.
+Configures the reward settings for voting, such as the reward per proposal. Only the smart wallet is allowed to call this instruction, ensuring that rewards are managed in a controlled manner.
+
+claimReward
+– Claim rewards for a voter.
+Allows a voter to claim any accrued rewards for participating in governance. This involves transferring rewards from a reward vault to the voter’s token account.
+
+setLocker
+– Sets the locker of the [Governor].
+Updates the locker (voting body) for the Governor, potentially reassigning or updating the set of accounts that hold voting power.
+
+createProposalMeta
+– Creates a [ProposalMeta].
+Attaches metadata to a proposal, such as a title and a link to a detailed description. This is useful for presenting context and details to voters.
+
+createOptionProposalMeta
+– Creates an [OptionProposalMeta].
+Similar to the previous instruction but designed for proposals that offer multiple selectable options. It allows the proposer to include an array of option descriptions.
+
+newDistributor
+• Purpose: Initializes a new Merkle distributor account.
+• What it does:
+  – Uses a PDA (derived from the constant "MerkleDistributor", a base account, the mint, and a version number) to create the distributor account.
+  – Sets up key parameters such as the Merkle root (for validating claims), maximum total claimable tokens, maximum number of nodes (i.e. individual claim entries), vesting start/end times, clawback start time, an activation point and type, and whether the distributor is closable.
+
+newDistributor2
+• Purpose: Similar to newDistributor, but with additional parameters for bonus rewards.
+• What it does:
+  – Creates a distributor account using the same PDA derivation scheme as newDistributor.
+  – In addition to the basic parameters, it accepts a total bonus amount and a bonus vesting duration. This variant can be used when you want to include extra bonus tokens in the distribution.
+
+closeDistributor
+• Purpose: Closes the distributor account (only available during the test phase).
+• What it does:
+  – Closes the distributor by transferring any remaining tokens from the token vault back to a destination token account.
+  – Requires that the admin signs the transaction.
+
+closeClaimStatus
+• Purpose: Closes a claim status account (again, only available in testing).
+• What it does:
+  – Closes the claim status PDA for a claimant, which tracks whether they have claimed tokens.
+  – Requires signatures from both the claimant and the admin.
+
+setActivationPoint
+• Purpose: Updates the activation point for the distributor.
+• What it does:
+  – Allows the admin to set or change the slot/timestamp at which the distributor becomes active for claims.
+
+newClaim
+• Purpose: Initiates a new claim for tokens from the distributor.
+• What it does:
+  – Uses a PDA (derived from the constant "ClaimStatus", the claimant’s public key, and the distributor) to create or update the claim status.
+  – Accepts the amounts of unlocked and locked tokens to be claimed, along with a Merkle proof (a vector of 32-byte arrays) that verifies the claimant’s eligibility according to the distributor’s Merkle root.
+
+claimLocked
+• Purpose: Claims the tokens that are locked (i.e. not yet unlocked by vesting).
+• What it does:
+  – Transfers tokens from the distributor’s token vault to the claimant’s destination account.
+  – Requires the claimant to sign, ensuring they can only claim for themselves.
+
+clawback
+• Purpose: Claw back tokens from the distributor.
+• What it does:
+  – Allows any caller (subject to the program’s rules) to claw back tokens from the distributor by moving them from the distributor’s token vault to a designated clawback account.
+  – This can be used, for example, if tokens are unclaimed or the distribution conditions aren’t met.
+
+setClawbackReceiver
+• Purpose: Updates the clawback receiver account.
+• What it does:
+  – Enables the admin to designate a new clawback receiver—i.e. the account that will receive tokens when a clawback is executed.
+
+setAdmin
+• Purpose: Changes the admin of the distributor.
+• What it does:
+  – Allows the current admin to set a new admin account for the distributor. This is useful for transferring control of the distribution process.
